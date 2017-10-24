@@ -15,7 +15,7 @@ type: markdown
 
 * 部署 [BookInfo]({{home}}/docs/guides/bookinfo.html) 示例应用程序。
 
-> 请注意：本文档假设示例应用程序通过kubernetes进行部署。所有的示例命令行都采用规则yaml文件中指定的kubernetes版本（例如`samples/bookinfo/kube/route-rule-all-v1.yaml`)。如果您在不同的环境下运行本任务，请将`kube`修改为您运行环境中相应的目录（例如，对基于Consul的运行环境，目录就是`samples/bookinfo/consul/route-rule-all-v1.yaml`）。
+> 请注意：本文档假设示例应用程序通过kubernetes进行部署。所有的示例命令行都采用规则yaml文件指定的kubernetes版本（例如`samples/bookinfo/kube/route-rule-all-v1.yaml`)。如果您在不同的环境下运行本任务，请将`kube`修改为您运行环境中相应的目录（例如，对基于Consul的运行环境，目录就是`samples/bookinfo/consul/route-rule-all-v1.yaml`）。
 
 ## 基于内容的路由
 
@@ -143,10 +143,10 @@ BookInfo示例部署了三个版本的reviews服务，因此我们需要设置�
 
 ## 理解规则背后的内容
 
-在这个任务中，您先使用Istio将100%的流量都路由到了v1版本的BookInfo服务。
-然后，再通过设置一条路由规则，基于请求header（例如一个用户cookie）选择性地将特定的流量路由到了v2版本的reviews服务。
+在这个任务中，您首先使用Istio将100%的请求流量都路由到了v1版本的BookInfo服务。
+然后再设置了一条路由规则，该路由规则基于请求的header（例如一个用户cookie）选择性地将特定的流量路由到了v2版本的reviews服务。
 
-一旦v2版本的reviews服务经过测试后满足要求，我们就可以使用Istio将来自所有用户的流量一次性或者渐进地路由到v2。我们将在另一个单独的任务中对此进行尝试。
+一旦v2版本的reviews服务经过测试后满足要求，我们就可以使用Istio将来自所有用户的流量一次性或者渐进地路由到v2版本。我们将在另一个单独的任务中对此进行尝试。
 
 ## 清理
 
