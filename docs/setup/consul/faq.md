@@ -1,9 +1,9 @@
 # FAQ
 
-* _我的应用程序无法运行，我应该在哪里调试？_
+* 我的应用程序无法运行，我应该在哪里调试？
 
-  Please ensure all required containers are running: etcd, istio-apiserver, consul, registrator, pilot.  If one of them is not running, you may find the {containerID} using `docker ps -a` and then use `docker logs {containerID}` to read the logs.   
+  请确保所有必需的容器都在运行：包括 etcd、istio-apiserver、consul、registrator、pilot 等。如果有任何一个容器没有运行，您可以使用 `docker ps -a` 命令来查找 {containerID}，然后使用 `docker logs {contaienrID}` 来查看容器日志。
 
-* _最终我该如何使用 istioctl 取消 context 的设置？_
+* 最终我该如何使用 istioctl 取消 context 的设置？
 
-  Your ```kubectl``` is switched to use the istio context at the end of the `istio context-create` command.  You can use ```kubectl config get-contexts``` to obtain the list of contexts and ```kubectl config use-context {desired-context}``` to switch to use your desired context.
+  在使用 `istio context-creat` 命令之后，您的 `kubectl` 就切换到了 istio 的上下文了。您可以使用 `kubectl config get-contexts` 命令来获取上下文列表，然后使用 `kubectl config use-context {希望使用的上下文}` 来切换到您想要使用的上下文环境。
