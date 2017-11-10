@@ -18,24 +18,27 @@ spec:
     weight: 100
 ```
 
-destination是服务的名称，流量将被导向到这里。在Istio的Kubernetes部署中，路由*tag* "version：v1"对应于Kubernetes *label* "version：v1"。该规则确保只有包含标签"version：v1"Kubernetes pod将会收到流量。可以使用 [istioctl CLI](../../reference/commands/istioctl.md) 配置规则。有关示例，请参阅 [配置请求路由任务](../../tasks/request-routing.md)。
+destination是服务的名称，流量将被导向到这里。在Istio的Kubernetes部署中，路由*tag* "version：v1"对应于Kubernetes *label* "version：v1"。该规则确保只有包含标签"version：v1"Kubernetes pod将会收到流量。可以使用[istioctl CLI](../../reference/commands/istioctl.md)配置规则。有关示例，请参阅[配置请求路由任务](../../tasks/request-routing.md)。
 
 在Istio中有两种类型的规则，**Routes/路由 和 Destination
 Policies/目的地策略**（这些与Mixer策略不同）。两种类型的规则控制请求如何路由到目标服务。
 
-## 路由
+## 路由规则
 
-Routes 控制请求如何路由到不同版本的服务。请求可以基于源和目标，HTTP header字段以及与个别服务版本相关联的权重进行路由。编写路由规则时，必须牢记以下重要方面：
+路由规则控制在Istio服务网格中请求如何路由。例如，路由规则可以将请求路由到服务的不同版本。可以基于源和目的地，HTTP header字段以及与个别服务版本相关联的权重来路由请求。编写路由规则时，必须牢记以下重要方面：
 
-### 通过destination限定规则
+### 用destination修饰规则
 
-每个规则对应于规则中的 *destination* 字段标识的目的地服务。例如，适用于"reviews"服务调用的所有规则将包括下面字段。
+每个规则对应某些目的地服务，由规则中的 *destination* 字段标识。例如，应用于"reviews"服务调用的规则至少将包括下面内容。
 
 ```yaml
-destination: reviews.default.svc.cluster.local
+destination:
+  name: reviews
 ```
 
-*destination* 的值应该是一个完全限定域名（Fully Qualified Domain Name,FQDN）。Pilot用它来给服务匹配规则。例如，在Kubernetes中，服务的完全限定域名可以使用以下格式构建：*serviceName.namespace.dnsSuffix*。
+*destination* 的值隐式或者显式地指定一个完全限定域名（Fully Qualified Domain Name,FQDN）。Istio Pilot用它来给服务匹配规则。例如，在Kubernetes中，服务的完全限定域名可以使用以下格式构建：*serviceName.namespace.dnsSuffix*。
+
+TBD：此处有大量更新
 
 ### 通过source/headers限定规则
 
