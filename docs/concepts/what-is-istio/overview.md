@@ -62,7 +62,7 @@ Envoy被部署为**边车**,和对应服务在同一个Kubernetes pod中。这�
 
 * 了解Istio的[设计目标](goals.md)。
 
-* 探索并尝试部署[示例应用程序](../../samples/bookinfo.md)。
+* 探索我们的[指南](../../guides)。
 
 * 在我们其他的[概念](../index.md)指南中详细了解Istio组件。
 
