@@ -1,6 +1,6 @@
 # BookInfo
 
-该示例部署由四个单独的微服务组成的简单应用程序，用于演示Istio服务网格的各种功能。
+该示例由四个独立的微服务组成，用于演示Istio服务网格的功能。
 
 ## 概况
 
@@ -23,11 +23,11 @@ BookInfo 应用程序包括四个独立的微服务：
 
 <img src="./img/bookinfo/noistio.svg" alt="BookInfo Application without Istio" title="BookInfo Application without Istio" />
 
-该应用程序是多语言构建的，即这些微服务是用不同的语言编写的。值得注意的是，这些服务与 Istio 没有任何依赖关系，单这是个有趣的 Service Mesh 示例，特别是因为评论服务和众多的语言和版本。
+该应用程序由多语言实现，即这些微服务使用不同的语言编写。值得注意的是，这些服务与 Istio 没有任何依赖关系。这是个有趣的 Service Mesh 示例，特别是对于评论服务，有多语言的版本。
 
 ## 开始之前
 
-如果您还没有这样做，请按照与您的平台 [安装指南](../../docs/setup/index.md) 对应的说明安装Istio。
+如果您还没有这样做，请按照 [安装指南](../../docs/setup/index.md) 对应的说明安装Istio。
 
 ## 部署应用程序
 
@@ -41,7 +41,7 @@ BookInfo 应用程序包括四个独立的微服务：
 
 ### 在 Kubernetes 中运行
 
-> 注意：如果您使用 GKE，清确保您的集群至少有 4 个标准的 GKE 节点。如果您使用 Minikube，请确保您至少有 4GB 内存。
+> 注意：如果您使用 GKE，请确保您的集群至少有 4 个标准的 GKE 节点。如果您使用 Minikube，请确保您至少有 4GB 内存。
 
 1. 将目录更改为 Istio 安装目录的根目录。
 
