@@ -1,4 +1,4 @@
-﻿{
+{
   "gitbook": ">=3.2.0",
   "description": "Istio官方文档中文版",
   "language": "zh-hans",
@@ -19,8 +19,7 @@
     "edit-link",
     "page-toc-button",
     "back-to-top-button",
-    "github-buttons@2.1.0",
-    "tbfed-pagefooter@^0.0.1"
+    "github-buttons@2.1.0"
   ],
   "pluginsConfig": {
     "edit-link": {
@@ -31,11 +30,6 @@
         "repo": "doczhcn/istio",
         "types": ["star"],
         "size": "small"
-    },
-    "tbfed-pagefooter": {
-        "copyright": "Copyright © servicemesh.cn 2017",
-        "modify_label": "Updated:",
-        "modify_format": "YYYY-MM-DD HH:mm:ss"
     }
   },
   "title": "Istio官方文档中文版",
