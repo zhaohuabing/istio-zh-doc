@@ -4,18 +4,7 @@
 
 [Istio](https://istio.io)是由Google/IBM/Lyft共同开发的新一代Service Mesh开源项目。
 
-您可以通过以下文章快速了解Service Mesh技术和Istio项目：
-
-- [Service Mesh：下一代微服务][servicemesh]: QCON 2017 上海站的演讲，系统介绍Service Mesh技术
-- [服务网格新生代--Istio][istio]: 介绍isito的文章
-
-目前Service Mesh技术还比较新颖，国内有了解的不多，为此我们组建了Service Mesh中国技术社区，欢迎加入。
-
-加入方式：请联系微信ID xiaoshu062 ，注明“服务网格”。
-
-## 内容
-
-这是Istio官方文档的中文翻译版。
+这是[Istio官方文档](https://istio.io/docs/)的中文翻译版，由Service Mesh中国社区组织翻译并更新维护。
 
 文档内容发布于gitbook，请点击下面的链接阅读或者下载电子版本:
 
@@ -30,8 +19,18 @@
 
 **请勿用于商业出版**。
 
-[servicemesh]: https://mp.weixin.qq.com/s?__biz=MzA3MDg4Nzc2NQ==&mid=2652136254&idx=1&sn=bba9bbd24ac8e5c1f6ef5d1125a6975b&chksm=84d53304b3a2ba12f88675c1bf51973aa1210d174da9e6c2ddcd1f3c84ec7e25987b3bce1071&mpshare=1&scene=1&srcid=1020GPmfbEVP9QDNlZBHg47I&pass_ticket=a%2B3t43zt60SHoI6fLsq80dbx%2FKCTnp9%2Bg1DgmORXY0hwwje1mB3uFmK9f9%2BSNZ2v#rd
-[istio]: https://mp.weixin.qq.com/s?__biz=MzA3MDg4Nzc2NQ==&mid=2652136078&idx=1&sn=b261631ffe4df0638c448b0c71497021&chksm=84d532b4b3a2bba2c1ed22a62f4845eb9b6f70f92ad9506036200f84220d9af2e28639a22045&mpshare=1&scene=1&srcid=0922JYb4MpqpQCauaT9B4Xrx&pass_ticket=F8CjNuTDg%2Fskt94bwJ%2B1yiPKpHJhaaRYpxDCqtNGMrMGkGsZDLF5EW1HCByba35u#rd
+## Service Mesh中国
+
+目前Service Mesh技术还比较新颖，为了方便技术交流，我们组建了Service Mesh中国社区，欢迎加入：
+
+http://www.servicemesh.cn/
+
+您可以通过Awesome Service Mesh资料清单快速了解Service Mesh技术和相关的Istio/linkerd等开源项目，这份清单由Service Mesh中国社区更新维护：
+
+https://servicemesh.gitbooks.io/awesome-servicemesh/
+
+如果想加入Service Mesh中国社区的微信群，请联系微信ID `xiaoshu062` ，注明“服务网格”。
+
 [gitbook]: https://doczhcn.gitbooks.io/istio/
 [qcloud]: http://istio.doczh.cn/
 [istio-pdf]: https://www.gitbook.com/download/pdf/book/doczhcn/istio
