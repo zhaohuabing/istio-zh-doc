@@ -57,7 +57,7 @@
     * [3.3.3 为TCP服务收集metrics](docs/tasks/telemetry/tcp-metrics.md)
     * [3.3.4 从Prometheus中查询Metrics](docs/tasks/telemetry/querying-metrics.md)
     * [3.3.5 使用Grafana可视化Metrics](docs/tasks/telemetry/using-istio-dashboard.md)
-    * [3.3.6 生成服务图](docs/tasks/telemetry/servicegraph.md)
+    * [3.3.6 生成服务图示](docs/tasks/telemetry/servicegraph.md)
     * [3.3.7 FAQ](docs/tasks/telemetry/faq.md)
   * [3.4 安全](docs/tasks/security/index.md)
     * [3.4.1 验证Istio交互TLS认证](docs/tasks/security/mutual-tls.md)
