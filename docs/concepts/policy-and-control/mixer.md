@@ -8,7 +8,6 @@
 
 Mixer在应用程序代码和基础架构后端之间提供通用中介层。它的设计将策略决策移出应用层，用运维人员能够控制的配置取而代之。应用程序代码不再将应用程序代码与特定后端集成在一起，而是与Mixer进行相当简单的集成，然后Mixer负责与后端系统连接。
 
-
 Mixer的设计目的是改变层次之间的边界，以此来降低总体的复杂性。从服务代码中剔除策略逻辑，改由运维人员进行控制。
 
 <img style="max-width:60%;" src="./img/mixer/traffic.svg" alt="Showing the flow of traffic through Mixer." title="Mixer Traffic Flow">
@@ -60,4 +59,5 @@ Mixer的核心运行时方法（`Check`和`Report`）都接受来自输入的一
 <img style="max-width:50%;" src="./img/mixer/phases.svg" alt="Phases of Mixer request processing." title="Request Phases" />
 
 ## 下一步
+
 阅读[博客](https://istio.io/blog/mixer-adapter-model.html)内容，理解Mixer的适配器模型。

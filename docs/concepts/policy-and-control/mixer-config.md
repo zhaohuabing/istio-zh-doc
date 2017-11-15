@@ -1,6 +1,6 @@
-# Mixer 配置
+# Mixer配置
 
-本节介绍 Mixer 的配置模型。
+本节介绍Mixer的配置模型。
 
 ## 背景
 
@@ -46,7 +46,7 @@ Mixer的配置有几个中心职责：
 
 配置的资源对象可以使用Kubernetes的资源语法来进行表述：
 
-~~~yaml
+```yaml
 apiVersion: config.istio.io/v1alpha2
 kind: rule, adapter kind, or template kind
 metadata:
@@ -54,7 +54,7 @@ metadata:
   namespace: istio-system
 spec:
   # 不同kind会有各自特定的配置
-~~~
+```
 
 - **apiVersion**：常量，取决于Istio的版本
 
@@ -72,7 +72,7 @@ spec:
 
 这里的例子配置了一个类型为`listchecker`的适配器。listchecker适配器使用一个列表来检查输入。如果配置的是白名单模式且输入值存在于列表之中，就会返回成功的结果。
 
-~~~yaml
+```yaml
 apiVersion: config.istio.io/v1alpha2
 kind: listchecker
 metadata:
@@ -81,13 +81,13 @@ metadata:
 spec:
   providerUrl: http://white_list_registry/
   blacklist: false
-~~~
+```
 
 `{metadata.name}.{kind}.{metadata.namespace}`是Handler的完全限定名。上面定义的对象的FQDN就是`staticversion.listchecker.istio-system`，他必须是唯一的。`spec`中的数据结构则依赖于对应的适配器的要求。
 
 有些适配器实现的功能就不仅仅是把Mixer和后端连接起来。例如`prometheus`适配器使用一种可配置的方式，消费指标并对其进行聚合：
 
-~~~yaml
+```yaml
 apiVersion: config.istio.io/v1alpha2
 kind: prometheus
 metadata:
@@ -112,7 +112,7 @@ spec:
     buckets:
       explicit_buckets:
         bounds: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
-~~~
+```
 
 每个适配器都定义了自己格式的配置数据。适配器及其配置的详尽列表可以在[这里](../../reference/config/mixer/adapters/)找到。
 
@@ -120,7 +120,7 @@ spec:
 
 配置实例将请求中的属性映射成为适配器的输入。下面的例子，是一个指标实例的配置，用于生成`requestduration`指标：
 
-~~~yaml
+```yaml
 apiVersion: config.istio.io/v1alpha2
 kind: metric
 metadata:
@@ -133,7 +133,7 @@ spec:
     destination_version: destination.labels["version"] | "unknown"
     response_code: response.code | 200
   monitored_resource_type: '"UNSPECIFIED"'
-~~~
+```
 
 注意Handler配置中需要的所有维度都定义在这一映射之中。
 
@@ -143,7 +143,7 @@ spec:
 
 规则用于指定使用特定实例配置调用某一Handler的时机。比如我们想要把`service1`服务中，请求头中带有`x-user`的请求的`requestduration`指标发送给Prometheus Handler:
 
-~~~yaml
+```yaml
 apiVersion: config.istio.io/v1alpha2
 kind: rule
 metadata:
@@ -155,7 +155,7 @@ spec:
   - handler: handler.prometheus
     instances:
     - requestduration.metric.istio-system
-~~~
+```
 
 规则对象中包含有一个`match`元素，用于前置检查，如果检查通过则会执行动作列表。动作中包含了一个实例列表，这个列表将会分发给Handler。规则必须使用Handler和实例的完全限定名。如果规则、Handler以及实例全都在同一个命名空间，命名空间后缀就可以在FQDN中省略，例如`handler.prometheus`。
 
@@ -167,30 +167,29 @@ Mixer具有多个独立的[请求处理阶段](./mixer.md#请求阶段) 。**属
 
 在前面的例子中，我们已经看到了一些简单的属性表达式。特别是：
 
-~~~yaml
+```yaml
   destination_service: destination.service
   response_code: response.code
   destination_version: destination.labels["version"] | "unknown"
-~~~
+```
 
 冒号右侧的序列是属性表达式的最简单形式。前两行只包括了属性名称。`response_code`标签的内容来自于`request.code`属性。
 
 以下是条件表达式的示例：
 
-~~~yaml
+```yaml
   destination_version: destination.labels["version"] | "unknown"
-~~~
+```
 
 上面的表达式里，`destination_version`标签被赋值为`destination.labels["version"]`，如果`destination.labels["version"]`为空，则使用`"unknown"`代替。
 
 在属性表达式中可用的属性必须符合该部署中的[属性清单](#manifests)。在清单中，每个属性都有一个用于描述属性所代表数据的数据类型。同样的，属性表达式也是有类型的，表达式中的属性类型以对这些属性的操作决定了表达式的数据类型。
 
-有关详细信息，请参阅 [属性表达式引用](../../reference/config/mixer/expression-language.md)。
-
+有关详细信息，请参阅[属性表达式引用](../../reference/config/mixer/expression-language.md)。
 
 #### 决议
 
-当请求到达时，Mixer会经过多个 [请求处理阶段](./mixer.md#请求阶段)。决议阶段涉及确定要用于处理传入请求的确切配置块。例如，到达 Mixer 的 service A 的请求可能与 service B 的请求有一些配置差异。决议决定哪个配置用于请求。
+当请求到达时，Mixer会经过多个[请求处理阶段](./mixer.md#请求阶段)。决议阶段涉及确定要用于处理传入请求的确切配置块。例如，到达 Mixer 的 service A 的请求可能与 service B 的请求有一些配置差异。决议决定哪个配置用于请求。
 
 决议依赖众所周知的属性来指导其选择，即所谓的**身份属性**。该属性的值是一个点号分隔的名称，它决定了Mixer在层次结构中从哪里开始查找用于请求的配置块。
 
@@ -238,4 +237,8 @@ manifests:
 
 ## 例子
 
-您可以通过访问 [示例](../../samples) 找到完整的Mixer配置示例。作为具体示例，这里是 [默认配置](https://github.com/istio/mixer/blob/master/testdata/configroot/scopes/global/subjects/global/rules.yml)。
+您可以通过访问[指南](../../guides)找到Mixer配置的完整示例。这里有一些[示例配置](https://github.com/istio/istio/blob/master/mixer/testdata/config)。
+
+## 下一步
+
+* 阅读阐述Mixer适配器模型的[博客文章](https://istio.io/blog/mixer-adapter-model.html)

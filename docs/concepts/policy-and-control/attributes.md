@@ -24,4 +24,4 @@ Istio属性使用类似Java的完全限定标识符作为属性名。允许的�
 
 ## 属性类型
 
-Istio属性是强类型的。支持的属性类型由 [ValueType]:https://github.com/istio/api/blob/master/mixer/v1/config/descriptor/value_type.proto 定义。
+Istio属性是强类型的。支持的属性类型由 [ValueType](https://github.com/istio/api/blob/master/mixer/v1/config/descriptor/value_type.proto) 定义。
