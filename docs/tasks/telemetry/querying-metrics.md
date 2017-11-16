@@ -1,16 +1,16 @@
-# 使用Prometheus查询监控信息
+# 从Prometheus中查询Metrics
 
-此任务向您展示如何使用Prometheus查询Istio监控信息。 作为此任务的一部分，您将安装Prometheus Istio插件，并使用Web界面查询监控信息。
+此任务向您展示如何使用Prometheus查询Istio监控信息。
 
-本章使用[BookInfo]({{home}}/docs/guides/bookinfo.html)示例应用程序作为例子。
+作为此任务的一部分，您将安装Prometheus Istio插件，并使用Web界面查询监控信息。
 
-## 环境准备
----
+本章使用[BookInfo](../../guides/bookinfo.md)示例应用程序作为例子。
 
-* [安装Istio]({{home}}/docs/setup/)，部署应用。
+## 开始之前
 
-## 查询Istio监控信息
----
+* [安装Istio](../docs/setup/)，部署应用。
+
+## 查询Istio metrics
 
 1. 要查询Mixer提供的监控信息，先要安装Prometheus插件。
 
@@ -34,8 +34,8 @@
    NAME         CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
    prometheus   10.59.241.54   <none>        9090/TCP   2m
    ```
- 
-3. 访问mesh。
+
+1. 访问mesh。
 
    在浏览器中访问`http://$GATEWAY_URL/productpage`或者用以下命令请求：
 
@@ -43,9 +43,9 @@
    curl http://$GATEWAY_URL/productpage
    ```
 
-   **提示：** `$GATEWAY_URL`的值请参考[BookInfo]({{home}}/docs/guides/bookinfo.html)。
+   **提示：** `$GATEWAY_URL`的值请参考[BookInfo](../../guides/bookinfo.md)。
 
-4. 打开Prometheus UI。
+1. 打开Prometheus UI。
 
    在Kubernetes中，执行以下命令：
 
@@ -55,7 +55,7 @@
 
    浏览器中访问：[http://localhost:9090/graph]（http://localhost:9090/graph）。
 
-5. Prometheus中执行查询。
+1. Prometheus中执行查询。
 
    在网页的"Expression"输入框中输入：`request_count`，然后点击**Execute**按钮。
 
@@ -95,13 +95,12 @@ Mixer内置了一个[Prometheus](https://prometheus.io)适配器，并开放了�
 1. *istio-mesh* （`istio-mixer.istio-system：42422)`）：所有Mixer产生的mesh metrics。
 
 2. *Mixer* （`istio-mixer.istio-system：9093`）：所有特定的Mixer metrics。 用于监控Mixer自身。
- 
+
 3. *envoy* （`istio-mixer.istio-system：9102`）：由envoy生成原始统计信息（并从statsd翻译成Prometheus）。
 
 有关查询Prometheus的更多信息，请阅读他们的[querying docs](https://prometheus.io/docs/prometheus/latest/querying/basics/)。
 
 ## 清除
----
 
 * 在Kubernetes中，执行如下命令删除Prometheus：
 
@@ -115,12 +114,11 @@ Mixer内置了一个[Prometheus](https://prometheus.io)适配器，并开放了�
    killall kubectl
    ```
 
-* 如果您不打算继续后续的章节，请参阅[BookInfo cleanup]({{home}}/docs/guides/bookinfo.html#cleanup)说明去关闭应用程序。
+* 如果您不打算继续后续的章节，请参阅[BookInfo cleanup](../../guides/bookinfo.md#cleanup)说明去关闭应用程序。
 
 ## 进一步阅读
----
 
-* 请参阅[In-Depth Telemetry]({{home}}/docs/guides/telemetry.html)指南。
+* 请参阅[深入遥测](../../guides/telemetry.md)指南。
 
 
 
