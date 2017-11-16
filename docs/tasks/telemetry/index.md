@@ -4,7 +4,7 @@
 
 * [收集metrics和日志](metrics-logs.md)。这个任务展示如何配置Istio来收集metrics和日志。
 
-* [为TCP服务收集metrics](tcp-metrics.md)。这个任务展示如何为TCP服务收集metrics和日志。
+* [收集TCP服务的Metrics](tcp-metrics.md)。这个任务展示如何为TCP服务收集metrics和日志。
 
 * [从Prometheus中查询Metrics](querying-metrics.md)。这个任务展示如何使用Prometheus查询metrics。
 

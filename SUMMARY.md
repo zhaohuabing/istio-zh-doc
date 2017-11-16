@@ -54,7 +54,7 @@
   * [3.3 Metrics，日志和跟踪](docs/tasks/telemetry/index.md)
     * [3.3.1 分布式跟踪](docs/tasks/telemetry/distributed-tracing.md)
     * [3.3.2 收集metrics和日志](docs/tasks/telemetry/metrics-logs.md)
-    * [3.3.3 为TCP服务收集metrics](docs/tasks/telemetry/tcp-metrics.md)
+    * [3.3.3 收集TCP服务的Metrics](docs/tasks/telemetry/tcp-metrics.md)
     * [3.3.4 从Prometheus中查询Metrics](docs/tasks/telemetry/querying-metrics.md)
     * [3.3.5 使用Grafana可视化Metrics](docs/tasks/telemetry/using-istio-dashboard.md)
     * [3.3.6 生成服务图示](docs/tasks/telemetry/servicegraph.md)
