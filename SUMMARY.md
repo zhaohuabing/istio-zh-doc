@@ -20,7 +20,6 @@
         * [属性](docs/concepts/policy-and-control/attributes.md)
         * [Mixer](docs/concepts/policy-and-control/mixer.md)
         * [Mixer配置](docs/concepts/policy-and-control/mixer-config.md)
-        * [Mixer Aspect配置](docs/concepts/policy-and-control/mixer-aspect-config.md)
 * [安装](docs/setup/index.md)
   * [Kubernetes](docs/setup/kubernetes/index.md)
     * [快速开始](docs/setup/kubernetes/quick-start.md)
