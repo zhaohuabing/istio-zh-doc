@@ -1,26 +1,31 @@
-# 收集监控信息和日志
+# 收集Metrics和日志
 
-本章展示如何配置Istio来自动收集mesh中服务的监控数据。 在本章末尾，将用一个新的metric和一个新的日志流调用到mesh中的服务。
+本章展示如何配置Istio来自动收集mesh中服务的遥测数据。
 
-[BookInfo]({{home}}/docs/guides/bookinfo.html)示例中的应用作为介绍本章内容的一个例子。
+在本章末尾，将为mesh中的服务调用启用新的metric和新的日志流。
 
-## 环境准备
----
+[BookInfo](../../guides/bookinfo.md)应用将作为介绍本章内容的示例应用。
 
-* 在集群中[安装Istio]({{home}}/docs/setup/)并部署一个应用程序。 本章假设Mixer使用默认配置（`--configDefaultNamespace=istio-system`）。 如果使用不同的值，则更新后续相关配置和命令。
+## 开始之前
 
-* 安装Prometheus插件。使用Prometheus验证任务是否成功。
+* 在集群中[安装Istio](../../setup/)并部署一个应用程序。
 
-  ```bash
-  kubectl apply -f install/kubernetes/addons/prometheus.yaml
-  ```
+	本章假设Mixer使用默认配置（`--configDefaultNamespace=istio-system`）。 如果使用不同的值，则更新这个任务中的配置和命令来匹配这个值。
+
+* 安装Prometheus插件。
+
+	Prometheus用于验证任务是否成功。
+
+    ```bash
+    kubectl apply -f install/kubernetes/addons/prometheus.yaml
+    ```
 
    详细信息请看[Prometheus](https://prometheus.io)。
 
-## 收集监控数据
----
+## 收集新的遥测数据
 
-1. 创建YAML文件，保存自动生成和收集Istio的新metric和日志流的配置。
+
+1. 创建YAML文件来保存新metric和日志流的配置，Istio将自动生成和收集。
 
    把以下内容保存成文件`new_telemetry.yaml`:
 
@@ -117,7 +122,7 @@
    istioctl create -f new_telemetry.yaml
    ```
 
-   输出类似如下内容：
+   期待输出类似内容：
 
    ```
    Created config metric/istio-system/doublerequestcount at revision 1973035
@@ -144,20 +149,18 @@
    kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=prometheus -o jsonpath='{.items[0].metadata.name}') 9090:9090 &
    ```
 
-
    通过[Prometheus UI](http://localhost:9090/graph#%5B%7B%22range_input%22%3A%221h%22%2C%22expr%22%3A%22double_request_count%22%2C%22tab%22%3A1%7D%5D)查看新metric信息。
 
    打开Prometheus UI，查询`double_request_count`。 **Console** tab页中有类似如下信息：
 
    ```
-   double_request_count{destination="details.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
+     double_request_count{destination="details.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
    double_request_count{destination="ingress.istio-system.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="unknown"}	2
    double_request_count{destination="productpage.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="ingress.istio-system.svc.cluster.local"}	2
    double_request_count{destination="reviews.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
    ```
 
-   有关查询Prometheus获取更多metric信息，请参阅[Querying Istio Metrics]({{home}}/docs/tasks/telemetry/querying-metrics.html)。
-
+   有关查询Prometheus获取更多metric信息，请参阅[查询Istio Metrics](querying-metrics.md)。
 
 1. 验证日志流是否已创建并可使用。
 
@@ -177,23 +180,21 @@
    {"level":"warn","ts":"2017-09-21T04:33:31.233Z","instance":"newlog.logentry.istio-system","destination":"ingress.istio-system.svc.cluster.local","latency":"74.47ms","responseCode":200,"responseSize":5599,"source":"unknown","user":"unknown"}
    ```
 
-## 如何理解监控的配置
----
+## 理解监控的配置
 
 在本章中，您添加了Istio配置，委托Mixer自动生成并报告mesh内所有流量的新metric和新日志流。
 
-增加管理三个Mixer功能的配置，分别是：
+新增配置控制Mixer功能的三块：
 
-1. 使用Istio属性生成实例（在本例中为监控指标和日志）。
+1. *instance*生成（在本例中为metrcis值和日志），使用Istio属性。
 
-1. 创建能够处理已生成实例的配置项（配置Mixer适配器）。
+1. *handler*（配置好的Mixer适配器）的创建，能够处理已生成的*实例*。
 
-1. 按照一套规则分发实例。
+1. 根据一套规则分发*instance*到*handler*。
 
-## 如何理解监控指标项的配置
----
+### 理解metrics配置
 
-监控指标项配置指定Mixer把监控指标值发送给Prometheus。它有三部分（或块）的配置组成：*instance*配置，*handler*配置和*rule*配置。
+metrics配置指定Mixer把metrics指标值发送给Prometheus。它由三部分（或块）的配置组成：*instance*配置，*handler*配置和*rule*配置。
 
 `kind: metric` 这部分配置定义了一个名为`doublerequestcount`的新metric模板去生成metric值（或实例）。这个实例的配置告诉Mixer如何根据Envoy返回的属性（同样由Mixer自身生成）为任何给定的请求生成metric。
 
@@ -209,8 +210,7 @@
 
 `kind: rule`配置定义了一个名为`doubleprom`的新规则。在该规则下Mixer将所有`doublerequestcount.metric`实例发送到`doublehandler.prometheus`处理。由于规则中没有`match`子句，并且由于该规则位于已配置默认命名空间（`istio-system`），因此mesh中的所有请求都会执行该规则。
 
-## 如何理解日志的配置
----
+## 理解日志的配置
 
 日志配置指定Mixer发送日志到stdout(标准输出)。它使用三部分（或块）配置：*instance*配置，*handler*配置和*rule*配置。
 
@@ -229,7 +229,6 @@
 为所有请求都执行该规则是不需要明确配置`match: true`。`spec`省略`match`参数项配置相当于设置`match：true`。这里是为了说明如何使用`match`表达式来配置控制规则。
 
 ## 清除
----
 
 * 删除监控配置：
 
@@ -237,19 +236,17 @@
   istioctl delete -f new_telemetry.yaml
   ```
 
-
-* 如果您不打算继续后面的章节，请参阅[BookInfo cleanup]({{home}}/docs/guides/bookinfo.html#cleanup)的说明关闭应用程序。
+* 如果您不打算继续后面的章节，请参阅[BookInfo cleanup](../docs/guides/bookinfo.md#cleanup)的说明关闭应用程序。
 
 ## 进一步阅读
----
 
-* 学习更多关于[Mixer]({{home}}/docs/concepts/policy-and-control/mixer.html)和[Mixer Config]({{home}}/docs/concepts/policy-and-control/mixer-config.html)。
+* 学习更多关于[Mixer](../../concepts/policy-and-control/mixer.md)和[Mixer Config](../../concepts/policy-and-control/mixer-config.md)。
 
-* 查看完整的[Attribute Vocabulary]({{home}}/docs/reference/config/mixer/attribute-vocabulary.html)。
+* 查看完整的[Attribute Vocabulary](../../reference/config/mixer/attribute-vocabulary.md)。
 
-* 阅读参考指南[Writing Config]({{home}}/docs/reference/writing-config.html)。
+* 阅读参考指南[编写配置](../../reference/writing-config.md)。
 
-* 请参阅[In-Depth Telemetry]({{home}}/docs/guides/telemetry.html)指南。
+* 请参阅[深入遥测](../../guides/telemetry.md)指南。
 
 
 
