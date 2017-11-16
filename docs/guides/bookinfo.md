@@ -76,10 +76,7 @@ BookInfo 应用程序包括四个独立的微服务：
     ```bash
     NAME                       CLUSTER-IP   EXTERNAL-IP   PORT(S)              AGE
     details                    10.0.0.31    <none>        9080/TCP             6m
-    istio-ingress              10.0.0.122   <pending>     80:31565/TCP         8m
-    istio-pilot                10.0.0.189   <none>        8080/TCP             8m
-    istio-mixer                10.0.0.132   <none>        9091/TCP,42422/TCP   8m
-    kubernetes                 10.0.0.1     <none>        443/TCP              14d
+    kubernetes                 10.0.0.1     <none>        443/TCP              7d
     productpage                10.0.0.120   <none>        9080/TCP             6m
     ratings                    10.0.0.15    <none>        9080/TCP             6m
     reviews                    10.0.0.170   <none>        9080/TCP             6m
@@ -96,9 +93,6 @@ BookInfo 应用程序包括四个独立的微服务：
     ```bash
     NAME                                        READY     STATUS    RESTARTS   AGE
     details-v1-1520924117-48z17                 2/2       Running   0          6m
-    istio-ingress-3181829929-xrrk5              1/1       Running   0          8m
-    istio-pilot-175173354-d6jm7                 2/2       Running   0          8m
-    istio-mixer-3883863574-jt09j                2/2       Running   0          8m
     productpage-v1-560495357-jk1lz              2/2       Running   0          6m
     ratings-v1-734492171-rnr5l                  2/2       Running   0          6m
     reviews-v1-874083890-f0qf0                  2/2       Running   0          6m
