@@ -56,7 +56,7 @@ BookInfo 应用程序包括四个独立的微服务：
     如果您使用 **手动注入 sidecar** 的方式部署的集群，清使用下面的命令：
 
     ```bash
-    kubectl apply -f <(istioctl kube-inject -f samples/apps/bookinfo/bookinfo.yaml)
+    kubectl apply -f <(istioctl kube-inject -f samples/bookinfo/kube/bookinfo.yaml)
     ```
 
     请注意，该 `istioctl kube-inject` 命令用于在创建部署之前修改 `bookinfo.yaml` 文件。这将把 Envoy 注入到 Kubernetes 资源,如 [这里](../reference/commands/istioctl.md#istioctl-kube-inject) 记载的。
