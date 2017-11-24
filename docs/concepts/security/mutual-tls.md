@@ -28,13 +28,13 @@ Istio Auth的目标是提高微服务及其通信的安全性，而不需要修�
 
 ## 组件
 
-### 身分
+### 身份
 
 在Kubernetes上运行时，Istio Auth使用[Kubernetes service account](../../tasks/configure-pod-container/configure-service-account/) 来识别谁在运行服务：
 
 * Istio中的service account格式为`spiffe://\<_domain_\>/ns/\<_namespace_>/sa/\<_serviceaccount_\>`
 
-	* _domain_当时是_cluster.local_. 我们将很快支持域的定制化。
+	* _domain_目前是_cluster.local_. 我们将很快支持域的定制化。
     * _namespace_ 是Kubernetes service account的namespace.
     * _serviceaccount_是Kubernetes service account name
 
@@ -62,7 +62,7 @@ Istio Auth的目标是提高微服务及其通信的安全性，而不需要修�
 
 Istio v0.2支持服务运行于Kubernetes pod和VM/裸机。对于每个场景，我们使用不同的秘钥配置机制。
 
-在于运行在Kubernetes pod上的服务，每群集Istio CA（证书颁发机构）自动化执行密钥和证书管理流程。它主要执行四个关键操作：
+在于运行在Kubernetes pod上的服务，每个集群的Istio CA（证书颁发机构）自动化执行密钥和证书管理流程。它主要执行四个关键操作：
 
 * 为每个service account生成一个 [SPIFFE][] 密钥和证书对
 
