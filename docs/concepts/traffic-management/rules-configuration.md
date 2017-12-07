@@ -22,12 +22,11 @@ destination是服务的名称，流量将被导向到这里。route _lables_标�
 
 可以使用[istioctl CLI](../../reference/commands/istioctl.md)配置规则，如果部署在Kubernetes中，也可以替代为使用kubectl命令。有关示例，请参阅[配置请求路由任务](../../tasks/request-routing.md)。
 
-在Istio中有三种类型的流量管理规则，**Route Rules/路由规则**， **Destination
-Policies/目的地策略**（这些与Mixer策略不同）和**Egress Rule/出口规则**。所有这三种类型的规则控制请求如何路由到目标服务。
+在Istio中有三种类型的流量管理规则，**Route Rules/路由规则**， **DestinationPolicies/目的地策略**（这些与Mixer策略不同）和**Egress Rule/出口规则**。所有这三种类型的规则控制请求如何路由到目标服务。
 
 ## 路由规则
 
-路由规则控制如何在Istio服务网格中路由请求。例如，路由规则可以将请求路由到服务的不同版本。可以基于源和目的地，HTTP header字段以及与个别服务版本相关联的权重来路由请求。编写路由规则时，必须牢记以下重要方面：
+路由规则控制如何在Istio服务网格中路由请求。例如，路由规则可以将请求路由到服务的不同版本。可以基于源和目的地，HTTP header字段以及与个别服务版本相关联的权重来路由请求。编写路由规则时，必须牢记以下重要方面：.
 
 ### 用destination修饰规则
 
@@ -74,7 +73,7 @@ destination:
 
 1. *限制为特定的调用者*
 
-	例如，以下规则仅适用于来自"reviews"服务的调用。
+  例如，以下规则仅适用于来自"reviews"服务的调用。
 
     ```yaml
     apiVersion: config.istio.io/v1alpha2
@@ -90,11 +89,11 @@ destination:
       ...
     ```
 
-	*source* 的值，和 *destination* 一样，指定服务的FQDN，无论是隐式还是显式。
+  *source* 的值，和 *destination* 一样，指定服务的FQDN，无论是隐式还是显式。
 
 2. *限制为调用者的特定版本*
 
-	例如，以下规则将细化上一个示例，仅适用于"reviews"服务的"v2"版本的调用。
+  例如，以下规则将细化上一个示例，仅适用于"reviews"服务的"v2"版本的调用。
 
     ```yaml
     apiVersion: config.istio.io/v1alpha2
@@ -114,7 +113,7 @@ destination:
 
 3. *选择基于HTTP header的规则*
 
-	例如，以下规则仅适用于传入请求，如果它包含"cookie" header, 并且内容包含"user=jason"。
+  例如，以下规则仅适用于传入请求，如果它包含"cookie" header, 并且内容包含"user=jason"。
 
     ```yaml
     apiVersion: config.istio.io/v1alpha2
