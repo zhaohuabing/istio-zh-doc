@@ -14,4 +14,4 @@
 
 服务可以通过使用HTTP 503响应健康检查来主动减轻负担。在这种情况下，服务实例将立即从调用者的负载均衡池中删除。
 
-[复杂的负载均衡算法]: https://lyft.github.io/envoy/docs/intro/arch_overview/load_balancing.html
+[复杂的负载均衡算法]: https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/arch_overview
