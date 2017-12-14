@@ -15,6 +15,7 @@
   "plugins": [
     "splitter",
     "-search",
+    "search-plus",
     "-sharing",
     "edit-link",
     "page-toc-button",
