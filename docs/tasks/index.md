@@ -16,13 +16,9 @@
 
 	* [控制Egress流量](traffic-management/egress.md)。描述如何控制Isto来路由流量，从mesh中的服务到外部服务。
 
-	* [FAQ](traffic-management/faq.md)。常见问题，已知局限和解决方案，还有这个话题上其他频繁被问的问题。
-
 * [策略实施](policy-enforcement/index.md)
 
 	* [开启限流](policy-enforcement/rate-limiting.md)。这个任务展示如何使用Istio来动态限制到服务的流量
-
-	* [FAQ](policy-enforcement/faq.md)。常见问题，已知局限和解决方案，还有这个话题上其他频繁被问的问题。
 
 * [Metrics，日志和跟踪](telemetry/index.md)
 
@@ -38,8 +34,6 @@
 
     * [生成服务图](telemetry/servicegraph.md)。这个任务展示如何把Istio网格中的服务生成服务图
 
-    * [FAQ](telemetry/faq.md)。常见问题，已知局限和解决方案，还有这个话题上其他频繁被问的问题。
-
 * [安全](security/index.md)
 
     * [验证Istio双向TLS认证](security/mutual-tls.md)。这个任务展示如何验证并测试Istio的自动交互TLS认证。
@@ -47,6 +41,4 @@
     * [配置基础访问控制](security/basic-access-control.md)。这个任务展示如何使用Kubernetes标签控制对服务的访问。
 
     * [配置安全访问控制](security/secure-access-control.md)。这个任务展示如何使用服务账号来安全的控制对服务的访问。
-
-    * [FAQ](security/faq.md)。常见问题，已知局限和解决方案，还有这个话题上其他频繁被问的问题。
 
