@@ -16,6 +16,8 @@
 
 	* [控制Egress流量](traffic-management/egress.md)。描述如何控制Isto来路由流量，从mesh中的服务到外部服务。
 
+	* [熔断](traffic-management/circuit-breaking.md)。这个任务展示熔断能力以构建有弹性的应用
+
 * [策略实施](policy-enforcement/index.md)
 
 	* [开启限流](policy-enforcement/rate-limiting.md)。这个任务展示如何使用Istio来动态限制到服务的流量
@@ -42,3 +44,6 @@
 
     * [配置安全访问控制](security/secure-access-control.md)。这个任务展示如何使用服务账号来安全的控制对服务的访问。
 
+	* [启用每服务双向认证](security/per-service-mtls.md)。这个任务展示如何为单个服务改变双向TLS认证。
+
+	* [插入CA证书和密钥](security/plugin-ca-cert.md)。这个任务展示运维人员如何插入已有证书和密钥到Istio CA中。
