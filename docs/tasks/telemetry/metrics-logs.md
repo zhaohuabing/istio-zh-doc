@@ -24,41 +24,95 @@
 
 ## 收集新的遥测数据
 
-
 1. 创建YAML文件来保存新metric和日志流的配置，Istio将自动生成和收集。
 
    把以下内容保存成文件`new_telemetry.yaml`:
 
    ```yaml
-   # Configuration for metric instances
-   apiVersion: "config.istio.io/v1alpha2"
-   kind: metric
-   metadata:
-     name: doublerequestcount
-     namespace: istio-system
-   spec:
-     value: "2" # count each request twice
-     dimensions:
-       source: source.service | "unknown"
-       destination: destination.service | "unknown"
-       message: '"twice the fun!"'
-     monitored_resource_type: '"UNSPECIFIED"'
-   ---
-   # Configuration for a Prometheus handler
-   apiVersion: "config.istio.io/v1alpha2"
-   kind: prometheus
-   metadata:
-     name: doublehandler
-     namespace: istio-system
-   spec:
-     metrics:
-     - name: double_request_count # Prometheus metric name
-       instance_name: doublerequestcount.metric.istio-system # Mixer instance name (fully-qualified)
-       kind: COUNTER
-       label_names:
-       - source
-       - destination
-       - message
+    # Configuration for metric instances
+    apiVersion: "config.istio.io/v1alpha2"
+    kind: metric
+    metadata:
+      name: doublerequestcount
+      namespace: istio-system
+    spec:
+      value: "2" # count each request twice
+      dimensions:
+        source: source.service | "unknown"
+        destination: destination.service | "unknown"
+        message: '"twice the fun!"'
+      monitored_resource_type: '"UNSPECIFIED"'
+    ---
+    # Configuration for a Prometheus handler
+    apiVersion: "config.istio.io/v1alpha2"
+    kind: prometheus
+    metadata:
+      name: doublehandler
+      namespace: istio-system
+    spec:
+      metrics:
+      - name: double_request_count # Prometheus metric name
+        instance_name: doublerequestcount.metric.istio-system # Mixer instance name (fully-qualified)
+        kind: COUNTER
+        label_names:
+        - source
+        - destination
+        - message
+    ---
+    # Rule to send metric instances to a Prometheus handler
+    apiVersion: "config.istio.io/v1alpha2"
+    kind: rule
+    metadata:
+      name: doubleprom
+      namespace: istio-system
+    spec:
+      actions:
+      - handler: doublehandler.prometheus
+        instances:
+        - doublerequestcount.metric
+    ---
+    # Configuration for logentry instances
+    apiVersion: "config.istio.io/v1alpha2"
+    kind: logentry
+    metadata:
+      name: newlog
+      namespace: istio-system
+    spec:
+      severity: '"warning"'
+      timestamp: request.time
+      variables:
+        source: source.labels["app"] | source.service | "unknown"
+        user: source.user | "unknown"
+        destination: destination.labels["app"] | destination.service | "unknown"
+        responseCode: response.code | 0
+        responseSize: response.size | 0
+        latency: response.duration | "0ms"
+      monitored_resource_type: '"UNSPECIFIED"'
+    ---
+    # Configuration for a stdio handler
+    apiVersion: "config.istio.io/v1alpha2"
+    kind: stdio
+    metadata:
+      name: newhandler
+      namespace: istio-system
+    spec:
+     severity_levels:
+       warning: 1 # Params.Level.WARNING
+     outputAsJson: true
+    ---
+    # Rule to send logentry instances to a stdio handler
+    apiVersion: "config.istio.io/v1alpha2"
+    kind: rule
+    metadata:
+      name: newlogstdio
+      namespace: istio-system
+    spec:
+      match: "true" # match for all requests
+      actions:
+       - handler: newhandler.stdio
+         instances:
+         - newlog.logentry
+    ---
    ---
    # Rule to send metric instances to a Prometheus handler
    apiVersion: "config.istio.io/v1alpha2"
@@ -124,7 +178,7 @@
 
    期待输出类似内容：
 
-   ```
+   ```bash
    Created config metric/istio-system/doublerequestcount at revision 1973035
    Created config prometheus/istio-system/doublehandler at revision 1973036
    Created config rule/istio-system/doubleprom at revision 1973037
@@ -153,18 +207,18 @@
 
    打开Prometheus UI，查询`double_request_count`。 **Console** tab页中有类似如下信息：
 
-   ```
-     double_request_count{destination="details.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
-   double_request_count{destination="ingress.istio-system.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="unknown"}	2
-   double_request_count{destination="productpage.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="ingress.istio-system.svc.cluster.local"}	2
-   double_request_count{destination="reviews.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
+   ```bash
+    istio_double_request_count{destination="details.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
+    istio_double_request_count{destination="ingress.istio-system.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="unknown"}	2
+    istio_double_request_count{destination="productpage.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="ingress.istio-system.svc.cluster.local"}	2
+    istio_double_request_count{destination="reviews.default.svc.cluster.local",instance="istio-mixer.istio-system:42422",job="istio-mesh",message="twice the fun!",source="productpage.default.svc.cluster.local"}	2
    ```
 
    有关查询Prometheus获取更多metric信息，请参阅[查询Istio Metrics](querying-metrics.md)。
 
 1. 验证日志流是否已创建并可使用。
 
-   在Kubernetes环境中，使用以下方式搜索Mixer pod窗格的日志：
+   在Kubernetes环境中，使用以下方式搜索Mixer pod的日志：
 
    ```bash
    kubectl -n istio-system logs $(kubectl -n istio-system get pods -l istio=mixer -o jsonpath='{.items[0].metadata.name}') mixer | grep \"instance\":\"newlog.logentry.istio-system\"
@@ -173,11 +227,11 @@
    输出类似以下内容：
 
    ```json
-   {"level":"warn","ts":"2017-09-21T04:33:31.249Z","instance":"newlog.logentry.istio-system","destination":"details","latency":"6.848ms","responseCode":200,"responseSize":178,"source":"productpage","user":"unknown"}
-   {"level":"warn","ts":"2017-09-21T04:33:31.291Z","instance":"newlog.logentry.istio-system","destination":"ratings","latency":"6.753ms","responseCode":200,"responseSize":48,"source":"reviews","user":"unknown"}
-   {"level":"warn","ts":"2017-09-21T04:33:31.263Z","instance":"newlog.logentry.istio-system","destination":"reviews","latency":"39.848ms","responseCode":200,"responseSize":379,"source":"productpage","user":"unknown"}
-   {"level":"warn","ts":"2017-09-21T04:33:31.239Z","instance":"newlog.logentry.istio-system","destination":"productpage","latency":"67.675ms","responseCode":200,"responseSize":5599,"source":"ingress.istio-system.svc.cluster.local","user":"unknown"}
-   {"level":"warn","ts":"2017-09-21T04:33:31.233Z","instance":"newlog.logentry.istio-system","destination":"ingress.istio-system.svc.cluster.local","latency":"74.47ms","responseCode":200,"responseSize":5599,"source":"unknown","user":"unknown"}
+    {"level":"warn","ts":"2017-09-21T04:33:31.249Z","instance":"newlog.logentry.istio-system","destination":"details","latency":"6.848ms","responseCode":200,"responseSize":178,"source":"productpage","user":"unknown"}
+    {"level":"warn","ts":"2017-09-21T04:33:31.291Z","instance":"newlog.logentry.istio-system","destination":"ratings","latency":"6.753ms","responseCode":200,"responseSize":48,"source":"reviews","user":"unknown"}
+    {"level":"warn","ts":"2017-09-21T04:33:31.263Z","instance":"newlog.logentry.istio-system","destination":"reviews","latency":"39.848ms","responseCode":200,"responseSize":379,"source":"productpage","user":"unknown"}
+    {"level":"warn","ts":"2017-09-21T04:33:31.239Z","instance":"newlog.logentry.istio-system","destination":"productpage","latency":"67.675ms","responseCode":200,"responseSize":5599,"source":"ingress.istio-system.svc.cluster.local","user":"unknown"}
+    {"level":"warn","ts":"2017-09-21T04:33:31.233Z","instance":"newlog.logentry.istio-system","destination":"ingress.istio-system.svc.cluster.local","latency":"74.47ms","responseCode":200,"responseSize":5599,"source":"unknown","user":"unknown"}
    ```
 
 ## 理解监控的配置
@@ -247,13 +301,3 @@ metrics配置指定Mixer把metrics指标值发送给Prometheus。它由三部分
 * 阅读参考指南[编写配置](../../reference/writing-config.md)。
 
 * 请参阅[深入遥测](../../guides/telemetry.md)指南。
-
-
-
-
-
-
-
-
-
-

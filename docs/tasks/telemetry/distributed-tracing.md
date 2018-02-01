@@ -54,19 +54,18 @@ BookInfo的应用程序启动和运行后，通过访问`http://$GATEWAY_URL/pro
 
 如果你查看仪表板，会看到类似以下的内容：
 
-<figure><img style="max-width:100%" src="./img/zipkin_dashboard.png" alt="Zipkin Dashboard" title="Zipkin Dashboard" />
-<figcaption>Zipkin Dashboard</figcaption></figure>
-<figure><img style="max-width:100%" src="./img/jaeger_dashboard.png" alt="Jaeger Dashboard" title="Jaeger Dashboard" />
-<figcaption>Jaeger Dashboard</figcaption></figure>
+![Zipkin Dashboard](./img/zipkin_dashboard.png)
+
+![Jaeger Dashboard](./img/jaeger_dashboard.png)
+
 
 如果你点击调用链堆栈中（最近的）最近的一条，您应该看到刷新`/ productpage`后最新的详细信息。页面看起来像这样：
 
-<figure><img style="max-width:100%" src="./img/zipkin_span.png" alt="Zipkin Trace View" title="Zipkin Trace View" />
-<figcaption>Zipkin Trace View</figcaption></figure>
-<figure><img style="max-width:100%" src="./img/jaeger_trace.png" alt="Jaeger Trace View" title="Jaeger Trace View" />
-<figcaption>Jaeger Trace View</figcaption></figure>
+![Zipkin Trace View](./img/zipkin_span.png)
 
-像您看到的，调用链由spans组成，其中每个span对应于使用`/ productpage`去调用BookInfo服务。 因为调用链堆栈是由Istio边车（Envoy代理）包装实际的服务完成的，所以每个服务具有相同的标签`istio-proxy`。右侧的目的地标签每一行标识该服务的调用耗时。
+![Jaeger Trace View](./img/jaeger_trace.png)
+
+像您看到的，调用链由spans组成，其中每个span对应于使用`/ productpage`去调用BookInfo服务。 因为调用链堆栈是由Istio Sidecar（Envoy代理）包装实际的服务完成的，所以每个服务具有相同的标签`istio-proxy`。右侧的目的地标签每一行标识该服务的调用耗时。
 
 第一行表示`productpage`服务被外部调用。`192.168.64.3:32000`标签是外部请求的主机信息（即$GATEWAY_URL）。 从调用堆栈中可以看到，请求总共耗时大约290毫秒完成。 在执行过程中，`productpage`调用`details`服务，耗时约24ms，然后调用`review`服务。`review`服务耗时约243毫秒，其中包括一个15毫秒的`ratings`服务。
 
@@ -141,13 +140,13 @@ def getForwardHeaders(request):
    如果使用Zipkin，请运行以下命令进行清理
 
    ```bash
-   kubectl delete -f install/kubernetes/addons/zipkin.ya
+   kubectl delete -f install/kubernetes/addons/zipkin.yaml
    ```
 
    如果使用Jaeger，请运行以下命令进行清理：
 
    ```bash
-   kubectl delete -f https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml
+	kubectl delete -f https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml
    ```
 
 * 如果您不打算继续后面的章节，请参阅[BookInfo cleanup](../../guides/bookinfo.md#cleanup)说明关闭应用程序。
