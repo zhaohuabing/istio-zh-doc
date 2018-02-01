@@ -12,6 +12,8 @@
 
 * [生成服务图](servicegraph.md)。这个任务展示如何把Istio网格中的服务生成服务图
 
+* [使用Fluentd记录日志](fluentd.md)。这个任务展示如何配置Istio来将日志记录到Fluentd后台服务
+
 
 
 

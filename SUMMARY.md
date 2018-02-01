@@ -56,6 +56,7 @@
     * [从Prometheus中查询Metrics](docs/tasks/telemetry/querying-metrics.md)
     * [使用Grafana可视化Metrics](docs/tasks/telemetry/using-istio-dashboard.md)
     * [生成服务图示](docs/tasks/telemetry/servicegraph.md)
+    * [使用Fluentd记录日志](docs/tasks/telemetry/fluentd.md)
   * [安全](docs/tasks/security/index.md)
     * [验证Istio交互TLS认证](docs/tasks/security/mutual-tls.md)
     * [配置基础访问控制](docs/tasks/security/basic-access-control.md)
