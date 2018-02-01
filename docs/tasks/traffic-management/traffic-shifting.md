@@ -1,16 +1,14 @@
 # 流量转移
 
-本任务将演示如何将应用流量逐渐从旧版本的服务迁移到新版本。通过Istio，可以使用一系列不同权重的规则（10%，20%，··· 100%）将流量平缓地从旧版本服务迁移到新版本服务。
-
-为简单起见，本任务将采用两步将流量从`reviews:v1` 迁移到 `reviews:v3`，权重分别为50%，100%。
+本任务将演示如何将应用流量逐渐从旧版本的服务迁移到新版本。通过Istio，可以使用一系列不同权重的规则（10%，20%，··· 100%）将流量平缓地从旧版本服务迁移到新版本服务。为简单起见，本任务将采用两步将流量从`reviews:v1` 迁移到 `reviews:v3`，权重分别为50%，100%。
 
 ## 开始之前
 
 * 参照文档[安装指南](../../setup/index.md)中的步骤安装Istio。
 
-* 部署[BookInfo](../../guides/bookinfo.md) 示例应用程序。
+* 部署[BookInfo](../../guides/bookinfo.md)示例应用程序。
 
->  请注意：本文档假设示采用kubernetes部署示例应用程序。所有的示例命令行都采用规则yaml文件（例如`samples/bookinfo/kube/route-rule-all-v1.yaml`）指定的kubernetes版本。如果在不同的环境下运行本任务，请将`kube`修改为运行环境中相应的目录（例如，对基于Consul的运行环境，目录就是`samples/bookinfo/consul/route-rule-all-v1.yaml`）。
+>  请注意：本文档假设示采用kubernetes部署示例应用程序。所有的示例命令都采用规则yaml文件（例如`samples/bookinfo/kube/route-rule-all-v1.yaml`）指定的kubernetes版本。如果在不同的环境下运行本任务，请将`kube`修改为运行环境中相应的目录（例如，对基于Consul的运行环境，目录就是`samples/bookinfo/consul/route-rule-all-v1.yaml`）。
 
 
 ## 基于权重的版本路由
@@ -23,10 +21,9 @@
 
 1. 在浏览器中打开http://$GATEWAY_URL/productpage,  确认`reviews` 服务目前的活动版本是v1。
 
-   可以看到浏览器中出现BooInfo应用的productpage页面。
-   注意`productpage`显示的评价内容不带星级。这是由于`reviews:v1`不会访问`ratings`服务。
+   可以看到BooInfo应用的productpage页面被显示出来。注意`productpage`显示的评价内容不带星级，因为`reviews:v1`不会访问`ratings`服务。
 
-   > 请注意：如果之前执行过 [配置请求路由](./request-routing.md)任务，则需要先注销测试用户“jason”或者删除之前单独为该用户创建的测试规则：
+   > 注意：如果之前执行过 [配置请求路由](./request-routing.md)任务，则需要先注销测试用户“jason”或者删除之前单独为该用户创建的测试规则：
 
      ```bash
      istioctl delete routerule reviews-test-v2
@@ -40,7 +37,32 @@
 
    注意这里使用了`istioctl replace`而不是`create`。
 
-1. 在浏览器中多次刷新`productpage`页面，大约有50%的几率会看到页面中出现带红星的评价内容。
+	确认规则被替换：
+
+   ```bash
+   istioctl get routerule reviews-default -o yaml
+   ```
+
+   ```bash
+	apiVersion: config.istio.io/v1alpha2
+    kind: RouteRule
+    metadata:
+      name: reviews-default
+      namespace: default
+    spec:
+      destination:
+        name: reviews
+      precedence: 1
+      route:
+      - labels:
+          version: v1
+        weight: 50
+      - labels:
+          version: v3
+        weight: 50
+   ```
+
+1. 在浏览器中多次刷新`productpage`页面，大约有50%的几率会看到页面中出现带*红星*的评价内容。
 
    > 请注意：在目前的Envoy sidecar实现中，可能需要刷新`productpage`很多次才能看到流量分发的效果。在看到页面出现变化前，有可能需要刷新15次或者更多。如果修改规则，将90%的流量路由到v3，可以看到更明显的效果。
 
@@ -69,7 +91,6 @@
   ```
 
 * 如果不打算尝试后面的任务，请参照[BookInfo cleanup](../../guides/bookinfo.md#cleanup) 中的步骤关闭应用程序。
-
 
 ## 进阶阅读
 
