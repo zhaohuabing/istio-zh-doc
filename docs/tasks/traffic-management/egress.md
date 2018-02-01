@@ -45,13 +45,13 @@
     apiVersion: config.istio.io/v1alpha2
     kind: EgressRule
     metadata:
-     name: google-egress-rule
+      name: google-egress-rule
     spec:
-     destination:
-       service: www.google.com
-     ports:
-       - port: 443
-         protocol: https
+      destination:
+        service: www.google.com
+      ports:
+        - port: 443
+          protocol: https
     EOF
     ```
 
@@ -61,7 +61,7 @@
 
     ```bash
     export SOURCE_POD=$(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name})
-    kubectl exec -it $SOURCE_POD -c sleep bash
+	kubectl exec -it $SOURCE_POD -c sleep bash
     ```
 
 2. 发出请求到外部HTTP服务：
@@ -106,13 +106,13 @@
     apiVersion: config.istio.io/v1alpha2
     kind: RouteRule
     metadata:
-     name: httpbin-timeout-rule
+      name: httpbin-timeout-rule
     spec:
-     destination:
-       service: httpbin.org
-     http_req_timeout:
-       simple_timeout:
-         timeout: 3s
+      destination:
+        service: httpbin.org
+      http_req_timeout:
+        simple_timeout:
+          timeout: 3s
     EOF
     ```
 
@@ -143,7 +143,27 @@
 kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml --includeIPRanges=10.0.0.1/24)
 ```
 
-在IBM Bluemix中使用：
+On IBM Cloud Private, use:
+
+1. 从`cluster/config.yaml`下的IBM Cloud Private配置文件中获取`service_cluster_ip_range`
+
+    ```bash
+    cat cluster/config.yaml | grep service_cluster_ip_range
+    ```
+
+	下面是输出示例：
+
+    ```bash
+    service_cluster_ip_range: 10.0.0.1/24
+    ```
+
+2. 通过`--includeIPRanges`，注入`service_cluster_ip_range`到应用的profile，来限制Isito的流量拦截到service cluster IP range。
+
+    ```bash
+    kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml --includeIPRanges=10.0.0.1/24)
+    ```
+
+在IBM Cloud Container Service上，使用：
 
 ```bash
 kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16,10.10.10.0/24)
@@ -154,7 +174,7 @@ kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml --includeIPR
 ```bash
 gcloud container clusters describe XXXXXXX --zone=XXXXXX | grep -e clusterIpv4Cidr -e servicesIpv4Cidr
 ```
-```
+```bash
 clusterIpv4Cidr: 10.4.0.0/14
 servicesIpv4Cidr: 10.7.240.0/20
 ```
