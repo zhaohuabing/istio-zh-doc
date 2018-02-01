@@ -1,6 +1,6 @@
 # 配置基础访问控制
 
-下面的任务展示了如何使用 Kubernetes 标签来控制对一个服务的访问。
+下面的任务展示了如何使用Kubernetes标签来控制对一个服务的访问。
 
 ## 开始之前
 
@@ -45,7 +45,7 @@
 
 	注意`denyreviewsv3`规则：
 
-   ```
+   ```bash
    match: destination.labels["app"] == "ratings" && source.labels["app"]=="reviews" && source.labels["version"] == "v3"
    ```
 

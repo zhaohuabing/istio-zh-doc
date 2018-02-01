@@ -6,19 +6,26 @@
 
 ## 开始之前
 
-* 根据说明[quick start](../../setup/kubernetes/quick-start.md)在开启认证的Kubernetes中安装Istio。注意，应当在[installation steps](../../setup/kubernetes/quick-start.md#installation-steps)中的第四步开启认证。
+* 根据[quick start](../../setup/kubernetes/quick-start.md)的说明在开启认证的Kubernetes中安装Istio。注意，应当在[installation steps](../../setup/kubernetes/quick-start.md#installation-steps)中的第四步开启认证。
 
 * 部署[BookInfo](../../guides/bookinfo.md)示例应用。
 
 * 执行下列命令创建`bookinfo-productpage`服务账户，并重新部署`productpage`服务及其服务账户。
 
-  ```bash
-  kubectl create -f <(istioctl kube-inject -f samples/bookinfo/kube/bookinfo-add-serviceaccount.yaml)
-  ```
+    ```bash
+    kubectl create -f <(istioctl kube-inject -f samples/bookinfo/kube/bookinfo-add-serviceaccount.yaml)
+    ```
+
+	期望看到类似如下的输入：
+
+    ```bash
+    serviceaccount "bookinfo-productpage" created
+	deployment "productpage-v1" configured
+    ```
 
   > 注意：如果使用`default`之外的命名空间，需要通过`istioctl -n namespace ...`来指定命名空间。
 
-## 使用 _denials_ 做访问控制
+## 使用_denials_做访问控制
 
 在示例应用[BookInfo](../../guides/bookinfo.md)中，`productpage`服务会同时访问`reviews`服务和`details`服务。现在让`details`服务拒绝来自`productpage`服务的请求：
 
@@ -38,15 +45,15 @@
 
    ```bash
    Created config denier/default/denyproductpagehandler at revision 2877836
-   Created config checknothing/default/denyproductpagerequest at revision 2877837
-   Created config rule/default/denyproductpage at revision 2877838
+    Created config checknothing/default/denyproductpagerequest at revision 2877837
+    Created config rule/default/denyproductpage at revision 2877838
    ```
 
    注意`denyproductpage` 规则中的下述内容:
 
-   ```
-   match: destination.labels["app"] == "details" && source.user == "spiffe://cluster.local/ns/default/sa/bookinfo-productpage"
-   ```
+    ```bash
+    match: destination.labels["app"] == "details" && source.user == "cluster.local/ns/default/sa/bookinfo-productpage"
+    ```
 
    匹配到了来自details服务上的服务账户 "_spiffe://cluster.local/ns/default/sa/bookinfo-productpage_"的请求。
 
@@ -66,9 +73,9 @@
 
 * 清除mixer配置：
 
-  ```bash
-  istioctl delete -f samples/bookinfo/kube/mixer-rule-deny-serviceaccount.yaml
-  ```
+    ```bash
+    istioctl delete -f samples/bookinfo/kube/mixer-rule-deny-serviceaccount.yaml
+    ```
 
 * 如果不打算继续接下来的更多任务，可参考[BookInfo cleanup](../../guides/bookinfo.md#cleanup)的指南来关闭应用。
 

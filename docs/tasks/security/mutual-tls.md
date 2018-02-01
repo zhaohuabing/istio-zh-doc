@@ -44,9 +44,7 @@ istio-ca   1         1         1            1           1m
 
 ## 测试认证安装
 
-当使用双向TLS认证运行Istio时，可以在服务的envoy中使用curl来给其他服务发送请求。
-
-举个例子，启动示例应用[BookInfo](../../guides/bookinfo.md)后，可以ssh到`productpage`服务的envoy容器中，并通过curl发送请求到其他服务。
+当使用双向TLS认证运行Istio时，可以在服务的envoy中使用curl来给其他服务发送请求。举个例子，启动示例应用[BookInfo](../../guides/bookinfo.md)后，可以ssh到`productpage`服务的envoy容器中，并通过curl发送请求到其他服务。
 
 有以下几个步骤：
 
@@ -68,7 +66,7 @@ istio-ca   1         1         1            1           1m
    kubectl exec -it productpage-v1-4184313719-5mxjc -c istio-proxy /bin/bash
    ```
 
-1. 确认key/cert在/etc/certs/目录中
+1. 确认`key/cert`在`/etc/certs/`目录中
 
    ```bash
    ls /etc/certs/
@@ -85,14 +83,14 @@ istio-ca   1         1         1            1           1m
    curl https://details:9080/details/0 -v --key /etc/certs/key.pem --cert /etc/certs/cert-chain.pem --cacert /etc/certs/root-cert.pem -k
    ```
    ```bash
-   ...
-   < HTTP/1.1 200 OK
-   < content-type: text/html; charset=utf-8
-   < content-length: 1867
-   < server: envoy
-   < date: Thu, 11 May 2017 18:59:42 GMT
-   < x-envoy-upstream-service-time: 2
-   ...
+    ...
+    < HTTP/1.1 200 OK
+    < content-type: text/html; charset=utf-8
+    < content-length: 1867
+    < server: envoy
+    < date: Thu, 11 May 2017 18:59:42 GMT
+    < x-envoy-upstream-service-time: 2
+    ...
    ```
 
 服务名称和端口定义参见[这里](https://github.com/istio/istio/blob/master/samples/bookinfo/kube/bookinfo.yaml)。
