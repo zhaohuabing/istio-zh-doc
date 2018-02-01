@@ -1,6 +1,6 @@
 # 规则配置
 
-Istio提供了简单的领域特定语言（DSL），用来控制应用部署中跨多个服务的API调用和4层流量。DSL允许运维人员配置服务级别的属性，如熔断器，超时，重试，以及设置常见的连续部署任务，如金丝雀推出，A/B测试，基于百分比流量拆分的分阶段推出等。详细信息请参阅[路由规则参考](../../reference/config/traffic-rules/index.md)。
+Istio提供了简单的领域特定语言（DSL），用来控制应用部署中跨多个服务的API调用和4层流量。DSL允许运维人员配置服务级别的属性，如熔断器，超时，重试，以及设置常见的连续部署任务，如金丝雀推出，A/B测试，基于百分比流量拆分的分阶段推出等。详细信息请参阅[路由规则参考](../../reference/config/istio.routing.v1alpha1.md)。
 
 例如，将“reviews”服务100％的传入流量发送到“v1”版本的简单规则，可以使用规则DSL进行如下描述：
 
@@ -115,21 +115,21 @@ destination:
 
   例如，以下规则仅适用于传入请求，如果它包含"cookie" header, 并且内容包含"user=jason"。
 
-    ```yaml
-    apiVersion: config.istio.io/v1alpha2
-    kind: RouteRule
-    metadata:
-      name: ratings-jason
-    spec:
-      destination:
-        name: reviews
-      match:
-        request:
-          headers:
-            cookie:
-              regex: "^(.*?;)?(user=jason)(;.*)?$"
-      ...
-    ```
+```yaml
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: ratings-jason
+spec:
+  destination:
+    name: reviews
+  match:
+    request:
+      headers:
+        cookie:
+          regex: "^(.*?;)?(user=jason)(;.*)?$"
+  ...
+```
 
 如果提供了多个属性值对，则所有相应的 header 必须与要应用的规则相匹配。
 
@@ -390,7 +390,7 @@ spec:
        maxConnections: 100
 ```
 
-[这里](../../reference/config/traffic-rules/destination-policies.md#istio.proxy.v1.config.CircuitBreaker)可以找到一整套简单的熔断器字段。
+[这里](../../reference/config/istio.routing.v1alpha1.md#CircuitBreaker)可以找到一整套简单的熔断器字段。
 
 ### 目的地策略评估
 
@@ -452,7 +452,7 @@ spec:
       protocol: https
 ```
 
-外部服务的地址通过*service*字段指定,该字段可以是一个完全限定域名（Fully Qualified Domain Name,FQDN），也可以是一个带通配符的域名。该域名代表了可在服务网格中访问的外部服务的一个白名单，该白名单中包括一个(字段值为完全限定域名的情况)或多个外部服务(字段值为带通配符的域名的情况)。[这里](../../reference/config/traffic-rules/egress-rules.md)可以找到*service*字段支持的域名通配符格式。
+外部服务的地址通过*service*字段指定,该字段可以是一个完全限定域名（Fully Qualified Domain Name,FQDN），也可以是一个带通配符的域名。该域名代表了可在服务网格中访问的外部服务的一个白名单，该白名单中包括一个(字段值为完全限定域名的情况)或多个外部服务(字段值为带通配符的域名的情况)。[这里](../../reference/config/istio.routing.v1alpha1.md)可以找到*service*字段支持的域名通配符格式。
 
 目前Istio在服务网格内只支持通过HTTP协议访问外部服务。然而边车（sidecar）和外部服务之间的通信可以是基于TLS的。如上面的例子所示，通过把*protocol*字段设置为"https",边车（sidecar）就可以通过TLS和外部服务进行通信。此时，服务网格内的应用只能通过HTTP协议对外部服务进行调用（例如，使用`http://secure-service.foo.com:443`，而不是`https://secure-service.foo.com`来访问外部服务），然而边车（sidecar）在向外部服务转发该请求时会采用TLS。
 
