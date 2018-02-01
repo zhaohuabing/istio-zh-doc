@@ -3,7 +3,7 @@
 Envoy提供了一套开箱即用, _选择加入_的故障恢复功能，可以在应用程序中受益。功能包括：
 
 1. 超时
-2. 带超时预算有限重试和重试之间的可变抖动
+2. 带超时预算有限重试以及重试之间的可变抖动
 3. 并发连接数和上游服务请求数限制
 4. 对负载均衡池的每个成员进行主动（定期）运行健康检查
 5. 细粒度熔断器（被动健康检查）- 适用于负载均衡池中的每个实例
@@ -18,7 +18,7 @@ Envoy提供了一套开箱即用, _选择加入_的故障恢复功能，可以�
 
 ## 微调
 
-Istio的流量管理规则允许运维人员为每个服务/版本设置故障恢复的全局默认值。然而，服务的消费者也可以通过特殊的HTTP头提供的请求级别值覆盖[超时][]和[重试][]的默认值。使用Envoy代理实现，header分别是"x-envoy-upstream-rq-timeout-ms"和"x-envoy-max-retries"。
+Istio的流量管理规则允许运维人员为每个服务/版本设置故障恢复的全局默认值。然而，服务的消费者也可以通过特殊的HTTP头提供的请求级别值覆盖[超时](../../reference/config/istio.routing.v1alpha1.md#HTTPTimeout)和[重试](../../reference/config/istio.routing.v1alpha1.md#HTTPRetry)的默认值。使用Envoy代理实现，header分别是"x-envoy-upstream-rq-timeout-ms"和"x-envoy-max-retries"。
 
 ## FAQ
 
@@ -33,6 +33,3 @@ Istio的流量管理规则允许运维人员为每个服务/版本设置故障�
 3. 同时使用应用级库和Envoy时，怎样处理失败？
 
   为相同目的地的服务给出两个故障恢复策略（例如，两次超时 - 一个在Envoy中设置，另一个在应用程序库中），**当故障发生时，两个限制都将被触发**。例如，如果应用程序为服务的API调用设置了5秒的超时时间，而运维人员员配置了10秒的超时时间，那么应用程序的超时将会首先启动。同样，如果特使的熔断器在应用熔断器之前触发，服务的API呼叫将从Envoy获得503。
-
-[超时]:../../reference/config/traffic-rules/routing-rules.md#istio.proxy.v1.config.HTTPTimeout
-[重试]:../../reference/config/traffic-rules/routing-rules.md#istio.proxy.v1.config.HTTPRetry

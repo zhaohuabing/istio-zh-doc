@@ -10,4 +10,4 @@ _Pilot架构_
 
 Pilot公开了用于[服务发现](https://envoyproxy.github.io/envoy/configuration/cluster_manager/sds_api.html) 、[负载均衡池](https://envoyproxy.github.io/envoy/configuration/cluster_manager/cds.html)和[路由表](https://envoyproxy.github.io/envoy/configuration/http_conn_man/rds.html)的动态更新的 API。这些API将Envoy从平台特有的细微差别中解脱出来，简化了设计并提升了跨平台的可移植性。
 
-运维人员可以通过[Pilot的Rules API](../../reference/config/traffic-rules/)指定高级流量管理规则。这些规则被翻译成低级配置，并通过discovery API分发到Envoy实例。
+运维人员可以通过[Pilot的Rules API](../../reference/config/istio.routing.v1alpha1.md)指定高级流量管理规则。这些规则被翻译成低级配置，并通过discovery API分发到Envoy实例。
