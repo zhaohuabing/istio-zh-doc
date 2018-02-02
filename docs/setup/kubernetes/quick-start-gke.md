@@ -18,9 +18,8 @@
 
 * <img src="img/exclamation-mark.svg" width = "25" height = "25" alt="警告" align=center /> 你必须设置你的默认计算服务账户包括一下方面：
 
->
-* <font color=red>roles/container.admin</font> (Kubernetes 引擎管理员)
-* <font color=red>Editor</font> (默认)
+> * <font color=red>roles/container.admin</font> (Kubernetes 引擎管理员)
+> * <font color=red>Editor</font> (默认)
 
 设置这些，在 [Cloud 控制台](https://console.cloud.google.com/iam-admin/iam/project) 上导航到 **IAM** 章节，默认从下文的 ：<font color=red>projectNumber-compute@developer.gserviceaccount.com</font>：找到默认的 GCE/GKE 服务账户，应该拥有**编辑者**的角色。然后在这个账户的**角色**下拉列表中，找到 **Kubernates 引擎**组，选择 **Kubernates 引擎管理员**。你账户中的**角色**列表将会变成**多个**。
 
@@ -38,7 +37,7 @@
 
 ![GKE-Istio Launcher](img/dm_launcher.png)
 
-<center>*GKE-Istio Launcher*</center>
+<center>GKE-Istio Launcher</center>
 
 等Istio完全部署好。注意这会消耗5分钟左右。
 
@@ -113,7 +112,7 @@ ing/gateway   *         35.202.120.89   80        3m
 
 ![GKE-Workloads](img/dm_kubernetes_workloads.png)
 
-<center>*GKE-Workloads*</center>
+<center>GKE-Workloads</center>
 
 
 ### 访问 BookInfo 样例
@@ -132,7 +131,7 @@ export GATEWAY_URL=35.202.120.89
 
 ![BookInfo](img/dm_bookinfo.png)
 
-<center>*BookInfo*</center>
+<center>BookInfo</center>
 
 3.现在给它发送一些信息：
 
@@ -164,7 +163,7 @@ http://localhost:3000/dashboard/db/istio-dashboard
 
 ![Grafana](img/dm_grafana.png)
 
-<center>*Grafana*</center>
+<center>Grafana</center>
 
 想通过 Grafana 看到更多细节，点击 [关于Grafana附加](../../tasks/telemetry/using-istio-dashboard.md)
 
@@ -184,7 +183,7 @@ http://localhost:9090/graph
 
 ![Prometheus](img/dm_prometheus.png)
 
-<center>*Prometheus*</center>
+<center>Prometheus</center>
 
 更多细节，点击[关于Prometheus附加](../../tasks/telemetry/querying-metrics.md)。
 
@@ -204,7 +203,7 @@ http://localhost:8088/dotviz
 
 ![ServiceGraph](img/dm_servicegraph.png)
 
-<center>*ServiceGraph*</center>
+<center>ServiceGraph</center>
 
 
 更多细节，点击[关于ServiceGraph附加](../../tasks/telemetry/servicegraph.md)。
@@ -225,7 +224,7 @@ http://localhost:9411
 
 ![Zipkin](img/dm_zipkin.png)
 
-<center>*Zipkin*</center>
+<center>Zipkin</center>
 
 更多追踪细节，点击[理解发生了什么](../../tasks/telemetry/distributed-tracing.md)。
 
