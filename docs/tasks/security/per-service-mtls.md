@@ -124,4 +124,3 @@ kubectl exec $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name})
 ```
 command terminated with exit code 35
 ```
-
