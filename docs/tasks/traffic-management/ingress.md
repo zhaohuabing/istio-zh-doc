@@ -280,6 +280,11 @@ spec:
               # if using prefix paths (/delay/.*), omit the .*.
               # if using exact match, use exact: /status
   route:
+  - weight: 100
+  httpReqTimeout:
+    simpleTimeout:
+      timeout: 4s
+EOF
 ```
 
 如果用URL`http://$INGRESS_HOST/delay/10`来发起对ingress的调用，会发现调用在4秒之后返回，而不是期待的10秒延迟。
