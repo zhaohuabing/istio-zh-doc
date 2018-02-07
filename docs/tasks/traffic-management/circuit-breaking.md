@@ -26,21 +26,21 @@
   apiVersion: config.istio.io/v1beta1
   kind: DestinationPolicy
   metadata:
-  name: httpbin-circuit-breaker
+    name: httpbin-circuit-breaker
   spec:
-  destination:
-    name: httpbin
-    labels:
-      version: v1
-  circuitBreaker:
-    simpleCb:
-      maxConnections: 1
-      httpMaxPendingRequests: 1
-      sleepWindow: 3m
-      httpDetectionInterval: 1s
-      httpMaxEjectionPercent: 100
-      httpConsecutiveErrors: 1
-      httpMaxRequestsPerConnection: 1
+    destination:
+      name: httpbin
+      labels:
+        version: v1
+    circuitBreaker:
+      simpleCb:
+        maxConnections: 1
+        httpMaxPendingRequests: 1
+        sleepWindow: 3m
+        httpDetectionInterval: 1s
+        httpMaxEjectionPercent: 100
+        httpConsecutiveErrors: 1
+        httpMaxRequestsPerConnection: 1
   EOF
   ~~~
 
