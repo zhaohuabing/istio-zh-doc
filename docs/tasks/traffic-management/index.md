@@ -15,3 +15,5 @@
 [控制Egress流量](egress.md)。描述如何控制Isto来路由流量，从mesh中的服务到外部服务。
 
 [熔断](circuit-breaking.md)。这个任务展示熔断能力以构建有弹性的应用
+
+[镜像](mirroring.md)。演示Istio的流量镜像功能。
