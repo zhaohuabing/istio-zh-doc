@@ -90,7 +90,7 @@ BookInfo示例部署了三个版本的reviews服务，因此需要设置一个�
 
    由于路由规则是通过异步方式分发到代理的，过一段时间后规则才会同步到所有pod上。因此需要等几秒钟后再尝试访问应用。
 
-1. 在浏览器中打开BookInfo应用程序的 URL(http://$GATEWAY_URL/productpage)。
+1. 在浏览器中打开BookInfo应用程序的 URL(<http://$GATEWAY_URL/productpage>)。
 
    可以看到BookInfo应用程序的productpage页面。
 
@@ -150,7 +150,7 @@ BookInfo示例部署了三个版本的reviews服务，因此需要设置一个�
   istioctl delete -f samples/bookinfo/kube/route-rule-reviews-test-v2.yaml
   ```
 
-* 如果不打算尝试后面的任务，请参照[BookInfo cleanup](../../guides/bookinfo.md#cleanup) 中的步骤关闭应用程序。
+* 如果不打算尝试后面的任务，请参照 [BookInfo cleanup](../../guides/bookinfo.md#cleanup) 中的步骤关闭应用程序。
 
 ## 下一步
 
