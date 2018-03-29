@@ -1,12 +1,12 @@
 # Pilot
 
-Pilot负责在Istio服务网格中部署的Envoy实例的生命周期。
+Pilot负责部署在Istio服务网格中的Envoy实例的生命周期管理。
 
 <img src="./img/pilot/PilotAdapters.svg" width="50%" height="50%" alt="Pilot's overall architecture." title="Pilot Architecture" />
 
 _Pilot架构_
 
-如上图所示，Pilot维护了网格中的服务的规范表示，这个表示是独立于底层平台的。Pilot中的平台特定适配器负责适当填充此规范模型。例如，Pilot中的Kubernetes适配器实现必要的控制器来查看Kubernetes API服务器，以得到pod注册信息的更改，入口资源以及存储流量管理规则的第三方资源。该数据被翻译成规范表示。Envoy特定配置是基于规范表示生成的。
+如上图所示，Pilot维护了网格中的服务的规范表示，这个表示是独立于底层平台的。Pilot中的平台特定适配器负责适当填充此规范模型。例如，Pilot中的Kubernetes适配器实现必要的控制器来watch Kubernetes API server中pod注册信息、ingress资源以及用于存储流量管理规则的第三方资源的更改。该数据被翻译成规范表示。Envoy特定配置是基于规范表示生成的。
 
 Pilot公开了用于[服务发现](https://envoyproxy.github.io/envoy/configuration/cluster_manager/sds_api.html) 、[负载均衡池](https://envoyproxy.github.io/envoy/configuration/cluster_manager/cds.html)和[路由表](https://envoyproxy.github.io/envoy/configuration/http_conn_man/rds.html)的动态更新的 API。这些API将Envoy从平台特有的细微差别中解脱出来，简化了设计并提升了跨平台的可移植性。
 
