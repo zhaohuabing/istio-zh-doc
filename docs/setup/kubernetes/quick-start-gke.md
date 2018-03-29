@@ -26,13 +26,13 @@
 
 ## 安装
 
-### 装载 Deployment Manager
+### 启动 Deployment Manager
 
 1. 一旦你的账户和项目启用，点击下文的链接，打开 Deployment Manager。
 
 > * [Istio GKE Deployment Manager](https://accounts.google.com/signin/v2/identifier?service=cloudconsole&continue=https://console.cloud.google.com/launcher/config?templateurl=https://raw.githubusercontent.com/istio/istio/master/install/gcp/deployment_manager/istio-cluster.jinja&followup=https://console.cloud.google.com/launcher/config?templateurl=https://raw.githubusercontent.com/istio/istio/master/install/gcp/deployment_manager/istio-cluster.jinja&flowName=GlifWebSignIn&flowEntry=ServiceLogin)
 
-我们建议你就像其他教程中表示的怎样访问已经安装的功能那样，保留默认设置。工具会默认创建一个特殊设置的 GKE alpha cluster，然后安装在 Istio [control plane](../../concepts/what-is-istio/overview.md)，[BookInfo](../../guides/bookinfo.md) 样例应用，[Grafana](../../tasks/telemetry/using-istio-dashboard.md) with [Prometheus](../../tasks/telemetry/querying-metrics.md)，[ServiceGraph](../../tasks/telemetry/servicegraph.md) 和 [Zipkin](../../tasks/telemetry/distributed-tracing.md)。你将会找到更多关于怎样访问所有这些如下功能。脚本将只在 `default` 的命名空间中打开 istio auto-injection。
+就像其他教程中的“如何访问已安装的功能”一样，我们也建议保留默认设置。工具会默认创建一个特殊设置的 GKE alpha cluster，然后安装在 Istio [control plane](../../concepts/what-is-istio/overview.md)，[BookInfo](../../guides/bookinfo.md) 样例应用，[Grafana](../../tasks/telemetry/using-istio-dashboard.md) with [Prometheus](../../tasks/telemetry/querying-metrics.md)，[ServiceGraph](../../tasks/telemetry/servicegraph.md) 和 [Zipkin](../../tasks/telemetry/distributed-tracing.md)。你将会找到更多关于怎样访问所有这些如下功能。脚本将只在 `default` 的命名空间中打开 istio auto-injection。
 
 2. 点击部署:
 
@@ -109,7 +109,7 @@ ing/gateway   *         35.202.120.89   80        3m
 
 记下已经给 BookInfo product page 指定好的 IP 和 Port。（例子中是 `35.202.120.89:80`） 
 
-你也可以在 Cloud Console 中的 **`*Kubernetes Engine -> Workloads`** 章节看到安装：
+你也可以在 Cloud Console 中的 **`Kubernetes Engine -> Workloads`** 章节看到安装：
 
 ![GKE-Workloads](img/dm_kubernetes_workloads.png)
 
@@ -231,7 +231,7 @@ http://localhost:9411
 
 ## 下一步
 
-你可以通过 [指南](../../guides/index.md) 里的任一指导，更深一步的探索 BookInfo 应用和 Istio 功能性。然而，你需要安装 `istioctl` 来与 Istio 进行交互。你可以在我们的工作站或者 Cloud Shell 来直接 [安装](quick-start.md) 。
+你可以通过 [指南](../../guides/index.md) 里的任一指导，更进一步探索 BookInfo 应用和 Istio 功能性。然而，你需要安装 `istioctl` 来与 Istio 进行交互。你可以在我们的工作站或者 Cloud Shell 来直接 [安装](quick-start.md) 。
 
 ## 卸载
 
