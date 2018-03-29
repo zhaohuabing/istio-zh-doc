@@ -1,5 +1,5 @@
 # 控制 Egress TCP 流量
-如[控制Egress流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)告诉我们可以从服务网格内部应用访问外部(指在Kubernetes外的服务)  HTTP 和 HTTPS 服务。默认情况下，支持 istio 的应用程序无法直接访问集群外部的 URL 。要启用这种访问，必须先定义 [Egress 规则](http://istio.doczh.cn/docs/concepts/traffic-management/rules-configuration.html#EgressRule)或者配置[直接调用外部服务](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html#直接调用外部服务
+如[控制Egress流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)告诉我们可以从服务网格内部应用访问外部(指在Kubernetes外的服务)的 HTTP 和 HTTPS 服务。默认情况下，支持 istio 的应用程序无法直接访问集群外部的 URL 。要启用这种访问，必须先定义 [Egress 规则](http://istio.doczh.cn/docs/concepts/traffic-management/rules-configuration.html#EgressRule)或者配置[直接调用外部服务](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html#直接调用外部服务
 )规则。
 
 此任务描述如何配置 Istio 内应用如何访问 Istio 外部的应用。
@@ -13,7 +13,7 @@ kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml)
 注意: 所有可以在容器中执行`exec`和`curl`的 pod 都是可以用于本任务的。
 
 ## 为外部TCP服务设置路由规则
-在这个任务中，我们将通过由应用发起 HTTPS 请求访问 `wikipedia.org` 。这个任务将演示应用无法使用 HTTP 与 HTTPS 协议访问外部服务的用例。[控制Egress流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)中描述了访问 HTTP 与 HTTPS 协议的外部应用，在[控制Egress流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)任务中，`https://www.google.com`通过使用`http://www.google.com:443`来进行访问。
+在这个任务中，我们将通过由应用发起 HTTPS 请求访问 `wikipedia.org` 。这个任务将演示应用无法使用 HTTP 与 HTTPS 协议访问外部服务的用例。[控制  Egress 流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)中描述了访问 HTTP 与 HTTPS 协议的外部应用，在[控制 Egress 流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)任务中，`https://www.google.com`通过使用`http://www.google.com:443`来进行访问。
 
 由应用发起的 HTTPS 流量将被视为不透明的 TCP 。为了启用这种流量，我们在端口443上定义一个 TCP Egress 规则。
 
@@ -23,7 +23,7 @@ kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml)
 或者， 如果通过 IP 访问 `wikipedia.org` 的话， 则必须定义该 IP 的 Tcp Egress 规则。
 
 ## 创建出口规则
-让我们创建出口规则来启用TCP访问 `wikipedia.org` ：
+让我们创建出口规则来启用 TCP 访问 `wikipedia.org` ：
 ```
 cat <<EOF | istioctl create -f -
 kind: EgressRule
@@ -89,7 +89,8 @@ kubectl exec -it $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.na
 curl -o /dev/null -s -w "%{http_code}\n" https://www.wikipedia.org
 200
 ```
-我们应该看到200打印输出，这是正确返回的 HTTP Code。
+我们应该看到200打印输出，这是正确返回的 HTTP Code 。
+
 3. 现在让我们获取英文维基百科上拥有文章的当前数量：
 ```
 curl -s https://en.wikipedia.org/wiki/Main_Page | grep articlecount | grep 'Special:Statistics'
@@ -98,9 +99,10 @@ curl -s https://en.wikipedia.org/wiki/Main_Page | grep articlecount | grep 'Spec
 ```
 <div id="articlecount" style="font-size:85%;"><a href="/wiki/Special:Statistics" title="Special:Statistics">5,563,121</a> articles in <a  href="/wiki/English_language" title="English language">English</a></div>
 ```
-这意味着在撰写此任务时，英文维基百科中有5,563,121篇文章。
+这意味着在撰写此任务时，英文维基百科中有 5,563,121 篇文章。
+
 ## 清理
-1. 删除我们创建的出口规则。
+1. 删除我们创建的 Egress 规则。
 ```
 istioctl delete egressrule wikipedia-range1 wikipedia-range2 wikipedia-range3 wikipedia-range4 wikipedia-range5 -n default
 ```
@@ -110,5 +112,5 @@ kubectl delete -f samples/sleep/sleep.yaml
 ```
 
 ## 下一步是什么
-* 该[Egress 规则配置](http://istio.doczh.cn/docs/concepts/traffic-management/rules-configuration.html#EgressRule)的参考。
-* 该[控制Egress流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)流量的任务，HTTP和HTTPS。
+* 该[ Egress 规则配置](http://istio.doczh.cn/docs/concepts/traffic-management/rules-configuration.html#EgressRule)的参考。
+* 该[控制 Egress 流量](http://istio.doczh.cn/docs/tasks/traffic-management/egress.html)流量的任务， HTTP 和 HTTPS 。
