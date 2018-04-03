@@ -51,7 +51,7 @@
 
 现在你可以部署你自己的应用或者安装程序中提供的示例应用，比如  [BookInfo](../../docs/guides/bookinfo.md)。
 
-> 注意 1: 因为 Docker 安装环境下没有 pods 的概念，Istio 的 sidecar 和应用程序会运行在同一个容器中。我们使用 [Registrator](http://gliderlabs.github.io/registrator/latest/) 自动注册服务实例到 Console 服务注册中心。
+> 注意 1: 因为 Docker 安装环境下没有 pods 的概念，Istio 的 sidecar 和应用程序会运行在同一个容器中。我们使用 [Registrator](http://gliderlabs.github.io/registrator/latest/) 自动注册服务实例到 Eureka 服务注册中心。
 
 > 注意 2: 应用的 HTTP 流量必须必须使用 HTTP/1.1 或者 HTTP/2.0 协议，因为 Istio 不支持 HTTP/1.0。 
 
