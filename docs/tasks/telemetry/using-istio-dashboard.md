@@ -4,7 +4,7 @@
 
 ## 开始之前
 
-- 在集群上[安装Istio](../../setup/)并部署一个应用。
+- 在集群上[安装Istio](../../setup/index.md)并部署一个应用。
 
 - 安装Prometheus插件。
 
