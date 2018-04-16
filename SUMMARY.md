@@ -46,7 +46,7 @@
 	* [熔断](docs/tasks/traffic-management/circuit-breaking.md)
   * [策略实施](docs/tasks/policy-enforcement/index.md)
     * [开启限流](docs/tasks/policy-enforcement/rate-limiting.md)
-  * [Metrics，日志和跟踪](docs/tasks/telemetry/index.md)
+  * [Metrics、日志和跟踪](docs/tasks/telemetry/index.md)
     * [分布式跟踪](docs/tasks/telemetry/distributed-tracing.md)
     * [收集metrics和日志](docs/tasks/telemetry/metrics-logs.md)
     * [收集TCP服务的Metrics](docs/tasks/telemetry/tcp-metrics.md)
