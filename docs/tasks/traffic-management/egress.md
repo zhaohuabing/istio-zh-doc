@@ -143,7 +143,7 @@
 kubectl apply -f <(istioctl kube-inject -f samples/sleep/sleep.yaml --includeIPRanges=10.0.0.1/24)
 ```
 
-On IBM Cloud Private, use:
+在IBM Cloud Private上，使用:
 
 1. 从`cluster/config.yaml`下的IBM Cloud Private配置文件中获取`service_cluster_ip_range`
 
