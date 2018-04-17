@@ -1,10 +1,10 @@
 # 断路器
 
-本文中的这一任务展示了弹性应用的熔断能力。开发人员可以凭借这一能力，来限制因为故障、延迟高峰以及其他预计外的网络异常所造成的影响范围。下面将会延时如何针对连接、请求以及外部检测来进行断路器配置。
+本文中的这一任务展示了弹性应用的熔断能力。开发人员可以凭借这一能力，来限制因为故障、延迟高峰以及其他预计外的网络异常所造成的影响范围。下面将会演示如何针对连接、请求以及外部检测来进行断路器配置。
 
 ## 开始之前
 
-- 遵循[安装指南](../../setup)设置Istio。
+- 遵循[安装指南](../../setup/index.md)设置Istio。
 - 启动[httpbin](../../samples/httpbin)实例作为本任务的后端：
 
 `kubectl apply -f <(istioctl kube-inject -f samples/httpbin/httpbin.yaml)`
@@ -17,7 +17,9 @@
 
 1. 创建缺省路由规则，让所有目标为`httpbin`的流量都指向`v1`：
 
+  ```bash
   istioctl create -f samples/httpbin/routerules/httpbin-v1.yaml
+  ```
 
 2. 创建[目标策略](../../reference/config/istio.routing.v1alpha1.md)来对`httpbin`的调用过程进行断路设置。
 
@@ -44,9 +46,9 @@
   EOF
   ~~~
 
-1. 确认目标策略是否正确创建
+3. 确认目标策略是否正确创建
 
-  ~~~
+  ~~~bash
   istioctl get destinationpolicy
 
   NAME                    KIND                                            NAMESPACE
@@ -57,13 +59,13 @@
 
 接下来我们来定义调用`httpbin`服务的规则。要创建一个客户端，用于向我们的服务发送流量，从而进一步体验断路器功能。我们会使用一个简单的负载测试工具[fortio](https://github.com/istio/fortio)。使用这个客户端我们可以控制连接数量、并发数以及外发HTTP调用的延迟。这一步骤中，我们会设置一个客户端，注入istio sidecar，以此保证客户端的通信也在istio的监管之下：
 
-~~~
+~~~bash
 kubectl apply -f <(istioctl kube-inject -f samples/httpbin/sample-client/fortio-deploy.yaml)
 ~~~
 
 这样我们就能够登入客户端 Pod，并使用fortio工具来调用`httpbin`，使用`-curl`开关可以指定我们只执行一次调用。
 
-~~~
+~~~bash
 FORTIO_POD=$(kubectl get pod | grep fortio | awk '{ print $1 }')
 kubectl exec -it $FORTIO_POD  -c fortio /usr/local/bin/fortio -- load -curl  http://httpbin:8000/get
 
@@ -99,7 +101,7 @@ x-envoy-upstream-service-time: 36
 
 在断路器设置中，我们指定`maxConnections: 1`以及`httpMaxPendingRequests: 1`。这样的设置下，如果我们并发超过一个连接和请求，istio-proxy就会断掉后续的请求和连接。我们试试两个并发链接（`-c 2`），发送20个请求（`-n 20`）：
 
-~~~
+~~~bash
 kubectl exec -it $FORTIO_POD  -c fortio /usr/local/bin/fortio -- load -c 2 -qps 0 -n 20 -loglevel Warning http://httpbin:8000/get
 
 Fortio 0.6.2 running at 0 queries per second, 2->2 procs, for 5s: http://httpbin:8000/get
@@ -138,7 +140,7 @@ Code 503 : 1 (5.0 %)
 
 这是因为istio-proxy允许一定的误差。我们把连接数提高到3：
 
-~~~
+~~~bash
 kubectl exec -it $FORTIO_POD  -c fortio /usr/local/bin/fortio -- load -c 3 -qps 0 -n 20 -loglevel Warning http://httpbin:8000/get
 
 Fortio 0.6.2 running at 0 queries per second, 2->2 procs, for 5s: http://httpbin:8000/get
@@ -189,7 +191,7 @@ Code 503 : 11 (36.7 %)
 
 只有63%的请求通过了，其他的都被断路器拒之门外，我们可以查询一下istio-proxy的统计数据：
 
-~~~
+~~~bash
 kubectl exec -it $FORTIO_POD  -c istio-proxy  -- sh -c 'curl localhost:15000/stats' | grep httpbin | grep pending
 
 cluster.out.httpbin.springistio.svc.cluster.local|http|version=v1.upstream_rq_pending_active: 0
@@ -204,14 +206,14 @@ cluster.out.httpbin.springistio.svc.cluster.local|http|version=v1.upstream_rq_pe
 
 1. 清除规则。
 
-  ~~~
+  ~~~bash
   istioctl delete routerule httpbin-default-v1
   istioctl delete destinationpolicy httpbin-circuit-breaker
   ~~~
 
 2. 关闭httpbin服务和客户端。
 
-  ~~~
+  ~~~bash
   kubectl delete deploy httpbin fortio-deploy
   kubectl delete svc httpbin
   ~~~

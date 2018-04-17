@@ -12,7 +12,7 @@
 
 - [概念](concepts/index.md)
 
-  概念解释了Istio的一些关键点。这里您可以了解Istio的工作原理以及它是如何实现的。
+  概念解释了Istio的一些关键点。在这里您可以了解Istio的工作原理及其实现。
 
 - [安装](setup/index.md)
 

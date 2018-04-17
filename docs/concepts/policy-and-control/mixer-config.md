@@ -4,7 +4,7 @@
 
 ## 背景
 
-Istio是一个具有数百个独立功能的复杂系统。Istio部署可能涉及数十个服务的蔓延事件，这些服务有一群Envoy代理和Mixer实例来支持它们。在大型部署中，许多不同的运维人员（每个运维人员都有不同的范围和责任范围）可能涉及管理整体部署。
+Istio是一个具有数百个独立功能的复杂系统。Istio部署可能涉及数十个服务的蔓延事件，这些服务有一群Envoy代理和Mixer实例来支持它们。在大型部署中，可能在管理整体部署中涉及到许多运维人员（每个运维人员都有不同的领域和责任范围）。
 
 Mixer的配置模式可以利用其所有功能和灵活性，同时保持使用的相对简单。该模型的范围特征使大型支持组织能够轻松地集中管理复杂的部署。该模型的一些主要功能包括：
 
@@ -40,8 +40,8 @@ Mixer的配置有几个中心职责：
 
 |概念                     |描述|
 |----------------------------|-----------|
-|[Handler](#handlers)|Handlers就是一个配置完成的适配器。适配器的构造器参数就是Handler的配置。|
-|[实例](#instances)|一个（请求）实例就是请求属性到一个模板的映射结果。这种映射来自于实例的配置。|
+|[Handler](#handlers)|Handler就是一个配置好的适配器实例。Handler的配置将作为适配器构造函数的参数。|
+|[实例](#instances)|（请求）实例就是请求属性到模板的映射结果。这种映射来自于实例的配置。|
 |[规则](#rules)|规则确定了何时使用一个特定的模板配置来调用一个Handler。|
 
 配置的资源对象可以使用Kubernetes的资源语法来进行表述：
@@ -85,7 +85,7 @@ spec:
 
 `{metadata.name}.{kind}.{metadata.namespace}`是Handler的完全限定名。上面定义的对象的FQDN就是`staticversion.listchecker.istio-system`，他必须是唯一的。`spec`中的数据结构则依赖于对应的适配器的要求。
 
-有些适配器实现的功能就不仅仅是把Mixer和后端连接起来。例如`prometheus`适配器使用一种可配置的方式，消费指标并对其进行聚合：
+有些适配器实现的功能就不仅仅是把Mixer和后端连接起来。例如`prometheus`适配器消费指标并以可配置的方式将它们聚合成分布或计数器。
 
 ```yaml
 apiVersion: config.istio.io/v1alpha2
@@ -183,33 +183,29 @@ Mixer具有多个独立的[请求处理阶段](./mixer.md#请求阶段) 。**属
 
 上面的表达式里，`destination_version`标签被赋值为`destination.labels["version"]`，如果`destination.labels["version"]`为空，则使用`"unknown"`代替。
 
-在属性表达式中可用的属性必须符合该部署中的[属性清单](#manifests)。在清单中，每个属性都有一个用于描述属性所代表数据的数据类型。同样的，属性表达式也是有类型的，表达式中的属性类型以对这些属性的操作决定了表达式的数据类型。
+在属性表达式中可用的属性必须符合该部署中的[属性清单](#manifests)。在清单中，每个属性都有一个用于描述属性所代表数据的数据类型。同样的，属性表达式也是有类型的，它们的类型是从表达式中的属性和应用于这些属性的运算符派生而来的。
 
 有关详细信息，请参阅[属性表达式引用](../../reference/config/mixer/expression-language.md)。
 
 #### 决议
 
-当请求到达时，Mixer会经过多个[请求处理阶段](./mixer.md#请求阶段)。决议阶段涉及确定要用于处理传入请求的确切配置块。例如，到达 Mixer 的 service A 的请求可能与 service B 的请求有一些配置差异。决议决定哪个配置用于请求。
+当请求到达时，Mixer 会经过多个[请求处理阶段](./mixer.md#请求阶段)。决议阶段涉及确定要用于处理传入请求的确切配置资源。例如，到达 Mixer 的 service A 的请求可能与 service B 的请求有一些配置差异。决议决定将哪个配置资源应用于请求。
 
-决议依赖众所周知的属性来指导其选择，即所谓的**身份属性**。该属性的值是一个点号分隔的名称，它决定了Mixer在层次结构中从哪里开始查找用于请求的配置块。
+决议（Resolution）依赖众所周知的属性来指导其选择，即所谓的**身份属性**。默认的身份属性是 `destination.service`。整个 mesh 级别的配置存储在 `configDefaultNamespace`，其默认指是`istio-system`。
 
-这是它的工作原理：
+通过以下步骤来完成一系列 `action`：
 
-1. 请求到达, Mixer提取身份属性的值以产生当前的查找值。
+1. 从请求中提取身份属性的值。
+2. 从身份属性中提取service namespace
+3. 评估 `configDefaultNamespace` 和 service namespace 中所有规则的 `match` 谓词。
 
-2. Mixer查找主题与查找值匹配的所有配置块。
-
-3. 如果Mixer找到多个匹配的块，则它只保留具有最大范围的块。
-
-4. Mixer从查找值的点号分割名称中截断最低元素。如果查找值不为空，则Mixer将返回上述步骤2。
-
-在此过程中发现的所有块都组合在一起，形成用于最终的有效配置评估当前的请求。
+这些步骤产生的 action 由 Mixer 执行。
 
 ### 清单
 
-清单捕获特定Istio部署中涉及到的组件的不变量。当前唯一支持的清单是**属性清单**，用于定义由各个组件生成的属性的精确集合。清单由组件生成器提供并插入到部署的配置中。
+清单（Manifest）捕获特定Istio部署中涉及到的组件的不变量。当前唯一支持的清单是**属性清单**，用于定义由各个组件生成的属性的确切集合。清单由组件生成器提供并插入到部署的配置中。
 
-以下是Istio代理的清单的一部分：
+以下是 Istio 代理的清单的一部分：
 
 ```yaml
 manifests:
@@ -237,8 +233,8 @@ manifests:
 
 ## 例子
 
-您可以通过访问[指南](../../guides)找到Mixer配置的完整示例。这里有一些[示例配置](https://github.com/istio/istio/blob/master/mixer/testdata/config)。
+您可以通过访问[指南](../../guides)找到 Mixer 配置的完整示例。这里有一些[示例配置](https://github.com/istio/istio/blob/master/mixer/testdata/config)。
 
 ## 下一步
 
-* 阅读阐述Mixer适配器模型的[博客文章](https://istio.io/blog/mixer-adapter-model.html)
+* 阅读阐述 Mixer 适配器模型的[博客文章](https://istio.io/blog/mixer-adapter-model.html)

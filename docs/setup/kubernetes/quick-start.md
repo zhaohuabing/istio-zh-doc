@@ -6,6 +6,8 @@
 
 > 注意：如果您安装了 Istio 0.1.x，在安装新版本前请先 [卸载](#卸载) 它们（包括已启用 Istio 应用程序 Pod 中的 sidecar）。
 
+* 安装或更新 kubernetes 命令行工具 [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) 以匹配集群的版本 （1.7 或者更高，支持CRD功能）
+
 * 取决于您的 kubernetes 提供商：
 
   * 本地安装 Istio，安装最新版本的 [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube/) (version 0.22.1 或者更高)。
@@ -29,13 +31,14 @@
   $(bx cs cluster-config <cluster-name>|grep "export KUBECONFIG")
   ```
 
+  * [IBM Cloud Private](https://www.ibm.com/cloud-computing/products/ibm-cloud-private/) 版本 2.1 或者更高：
+    * 配置`kubectl`用以访问基于IBM Cloud的私有集群的步骤可以参考 [这里](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0/manage_cluster/cfc_cli.html)。
   * [Openshift Origin](https://www.openshift.org) 3.7 或者以上版本：
-
-    * 默认情况下，Openshift 不允许以 UID 0运行容器。为 Istio 的入口（ingress）和出口（egress）service account 启用使用UID 0运行的容器：
+    * 默认情况下，Openshift 不允许以 UID 0运行容器。为 Istio 的入口（ingress）以及附加组件Prometheus 和 Grafana 的 service account 启用使用UID 0运行的容器：
   ```bash
   oc adm policy add-scc-to-user anyuid -z istio-ingress-service-account -n istio-system
-  oc adm policy add-scc-to-user anyuid -z istio-egress-service-account -n istio-system
-  oc adm policy add-scc-to-user anyuid -z default -n istio-system
+  oc adm policy add-scc-to-user anyuid -z istio-grafana-service-account -n istio-system
+  oc adm policy add-scc-to-user anyuid -z istio-prometheus-service-account -n istio-system
   ```
 
     * 运行应用程序 Pod 的 service account 需要特权安全性上下文限制，以此作为 sidecar 注入的一部分:
@@ -43,11 +46,9 @@
   oc adm policy add-scc-to-user privileged -z default -n <target-namespace>
   ```
 
-* 安装或升级 Kubernetes 命令行工具 [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) 以匹配您的集群版本（1.7或以上版本）。
-
 ## 安装步骤
 
-不论对于哪个 Istio 发行版，都安装到 `istio-system` namespace 下，即可以管理所有其它 namespace 下的微服务。
+从 0.2 版本开始，Istio 安装到 `istio-system` namespace 下，即可以管理所有其它 namespace 下的微服务。
 
 1. 到 [Istio release](https://github.com/istio/istio/releases) 页面上，根据您的操作系统下载对应的发行版。如果您使用的是 MacOS 或者 Linux 系统，可以使用下面的额命令自动下载和解压最新的发行版：
   ```bash
@@ -60,9 +61,10 @@
     * `istioctl` 客户端二进制文件在 `bin` 目录下。`istioctl` 文件用户手动注入 Envoy sidecar 代理、创建路由和策略等。
     * `istio.VERSION` 配置文件
 
-3. 切换到 istio 包的解压目录。例如 istio-0.2.7：
+3. 切换到 istio 包的解压目录。例如 istio-0.4.0：
+
   ```bash
-  cd istio-0.2.7
+  cd istio-0.4.0
   ```
 
 4. 将 `istioctl` 客户端二进制文件加到 PATH 中。
@@ -91,20 +93,20 @@
 
   这两个选项都会创建 `istio-system` 命名空间以及所需的 RBAC 权限，并部署 Istio-Pilot、Istio-Mixer、Istio-Ingress、Istio-Egress 和 Istio-CA（证书颁发机构）。
 
-6. *可选的*：如果您的 kubernetes 集群开启了 alpha 功能，并想要启用 [自动注入 sidecar](../../..//docs/setup/kubernetes/sidecar-injection.md#automatic-sidecar-injection)，需要安装 Istio-Initializer：
+  1. *可选的*：如果您的 kubernetes 集群开启了 alpha 功能，并想要启用 [自动注入 sidecar](../../..//docs/setup/kubernetes/sidecar-injection.md#automatic-sidecar-injection)，需要安装 Istio-Initializer：
+
   ```bash
   kubectl apply -f install/kubernetes/istio-initializer.yaml
   ```
 
 ## 验证安装
 
-1. 确认系列 kubernetes 服务已经部署了： `istio-pilot`、 `istio-mixer`、`istio-ingress`、 `istio-egress`：
+1. 确认系列 kubernetes 服务已经部署了： `istio-pilot`、 `istio-mixer`、`istio-ingress`：
   ```bash
   kubectl get svc -n istio-system
   ```
    ```bash
   NAME            CLUSTER-IP      EXTERNAL-IP       PORT(S)                       AGE
-  istio-egress    10.83.247.89    <none>            80/TCP                        5h
   istio-ingress   10.83.245.171   35.184.245.62     80:32730/TCP,443:30574/TCP    5h
   istio-pilot     10.83.251.173   <none>            8080/TCP,8081/TCP             5h
   istio-mixer     10.83.244.253   <none>            9091/TCP,9094/TCP,42422/TCP   5h
@@ -113,17 +115,16 @@
   注意：如果您运行的集群不支持外部负载均衡器（如 minikube）， `istio-ingress`  服务的 `EXTERNAL-IP` 显示  `<pending>`。你必须改为使用 NodePort service 或者 端口转发方式来访问应用程序。
 
 2. 确认对应的 Kubernetes pod 已部署并且所有的容器都启动并运行：
-   `istio-pilot-*`、 `istio-mixer-*`、 `istio-ingress-*`、 `istio-egress-*`、`istio-ca-*`， `istio-initializer-*` 是可以选的。
+   `istio-pilot-*`、 `istio-mixer-*`、 `istio-ingress-*`、 `istio-ca-*`， `istio-initializer-*` 是可以选的。
    ```bash
      kubectl get pods -n istio-system
    ```
    ```bash 
-     istio-ca-3657790228-j21b9           1/1       Running   0          5h
-     istio-egress-1684034556-fhw89       1/1       Running   0          5h
-     istio-ingress-1842462111-j3vcs      1/1       Running   0          5h
-     istio-initializer-184129454-zdgf5   1/1       Running   0          5h
-     istio-pilot-2275554717-93c43        1/1       Running   0          5h
-     istio-mixer-2104784889-20rm8        2/2       Running   0          5h
+   istio-ca-3657790228-j21b9           1/1       Running   0          5h
+   istio-ingress-1842462111-j3vcs      1/1       Running   0          5h
+   istio-initializer-184129454-zdgf5   1/1       Running   0          5h
+   istio-pilot-2275554717-93c43        1/1       Running   0          5h
+   istio-mixer-2104784889-20rm8        2/2       Running   0          5h
    ```
 
 ## 部署应用
@@ -151,7 +152,7 @@ kubectl create -f <(istioctl kube-inject -f <your-app-spec>.yaml)
   kubectl delete -f install/kubernetes/istio-initializer.yaml
    ```
 
-* 卸载 Istio 核心组件。对于某一 Istio 版本，删除 RBAC 权限，`istio-system` namespace，和该命名空间的下的各层级资源。
+* 卸载 Istio 核心组件。对于 Istio 0.4.0 版本，删除 RBAC 权限，`istio-system` namespace，和该命名空间的下的各层级资源。
 
    不必理会在层级删除过程中的各种报错，因为这些资源可能已经被删除的。
 

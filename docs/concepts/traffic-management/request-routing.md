@@ -22,7 +22,7 @@ Istio不提供DNS。应用程序可以尝试使用底层平台（kube-dns，meso
 
 ## Ingress和Egress
 
-Istio假定进入和离开服务网络的所有流量都会通过Envoy代理进行传输。通过将Envoy代理部署在服务之前，运维人员可以针对面向用户的服务进行A/B测试，部署金丝雀服务等。类似地，通过使用Envoy将流量路由到外部Web服务（例如，访问Maps API或视频服务API），运维人员可以添加故障恢复功能，例如超时，重试，熔断器等，并在访问这些服务的连接上获得详细指标。
+Istio假定进入和离开服务网络的所有流量都会通过Envoy代理进行传输。通过将Envoy代理部署在服务之前，运维人员可以针对面向用户的服务进行A/B测试，部署金丝雀服务等。类似地，通过使用Envoy将流量路由到外部Web服务（例如，访问Maps API或视频服务API），运维人员可以添加故障恢复功能，例如超时、重试、熔断器等，并在访问这些服务的连接上获得详细指标。
 
 <img src="./img/pilot/ServiceModel_RequestFlow.svg" width="50%" height="50%" alt="Ingress and Egress Envoy." title="Request Flow" />
 
