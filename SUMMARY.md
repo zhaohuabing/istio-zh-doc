@@ -72,4 +72,4 @@
         * [Mixer](docs/reference/api/istio.mixer.v1.md)
     * [配置](docs/reference/config/index.md)
     	* [Mixer](docs/reference/config/mixer/index.md)	
-        	* [属性词汇表](docs/reference/config/mixer/attribute-vocabulary.md)
+        	* [属性词汇](docs/reference/config/mixer/attribute-vocabulary.md)

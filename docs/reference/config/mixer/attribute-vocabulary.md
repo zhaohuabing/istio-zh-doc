@@ -1,4 +1,4 @@
-以字节计算的请求大小。属性词汇
+# 属性词汇
 
 属性是整个Istio使用的中心概念。可以在 [这里](../../../concepts/policy-and-control/attributes.md) 找到属性是什么和用于何处的描述。
 
@@ -43,20 +43,20 @@
 | response.code | int64 | 应答的 HTTP 状态码. | |
 | connection.id | string | TCP 连接的ID，具有统计上较低的碰撞概率。 | |
 | connection.received.bytes | int64 | 对于一条连接，在最后一次Report()之后，目的地服务在此连接上接收到的字节数量 | |
-| connection.received.bytes_total | int64 | 在连接的生命周期中，目的地服务器接收到的全部字节数量 | |
-| connection.sent.bytes | int64 | Number of bytes sent by a destination service on a connection since the last Report() for a connection. | |
-| connection.sent.bytes_total | int64 | Total number of bytes sent by a destination service during the lifetime of a connection. | |
-| connection.duration | duration | The total amount of time a connection has been open. | |
-| context.protocol | string | Protocol of the request or connection being proxied. | tcp |
-| context.time | timestamp | The timestamp of Mixer operation. | |
-| api.service | string | The public service name. This is different than the in-mesh service identity and reflects the name of the service exposed to the client. | my-svc.com |
-| api.version | string | The API version. | v1alpha1 |
-| api.operation | string | Unique string used to identify the operation. The id is unique among all operations described in a specific <service, version>. | getPetsById |
-| api.protocol | string | The protocol type of the API call. Mainly for monitoring/analytics. Note that this is the frontend protocol exposed to the client, not the protocol implemented by the backend service. | "http", “https”, or "grpc" |
+| connection.received.bytes_total | int64 | 在连接的生命周期中，目的地服务接收到的全部字节数量 | |
+| connection.sent.bytes | int64 | 对于一条连接，在最后一次Report()之后，目的地服务在此连接上发送的字节数量 | |
+| connection.sent.bytes_total | int64 | 在连接的生命周期中，目的地服务发送的全部字节数量 | |
+| connection.duration | duration | 连接打开的时间总数量 | |
+| context.protocol | string | 请求或者被代理的连接的协议 | tcp |
+| context.time | timestamp | Mixer 操作的时间戳. | |
+| api.service | string | 公开的服务名。和处于mesh中的服务身份不同，并反映到暴露给客户度的名称。 | my-svc.com |
+| api.version | string | API 版本. | v1alpha1 |
+| api.operation | string | 用于辨别操作的唯一字符串。在特定的`<service, version>` 描述的所有操作中，这个ID是唯一的。 | getPetsById |
+| api.protocol | string | API调用的协议类型。主要用于监控／分析。注意这事暴露给客户端的前端协议，不是后端服务实现的协议。 | "http", “https”, 或 "grpc" |
 | request.auth.principal | string | The authenticated principal of the request. This is a string of the issuer (`iss`) and subject (`sub`) claims within a JWT concatenated with “/” with a percent-encoded subject value. | accounts.my-svc.com/104958560606 |
 | request.auth.audiences | string | The intended audience(s) for this authentication information. This should reflect the audience (`aud`) claim within a JWT. | ['my-svc.com', 'scopes/read'] |
 | request.auth.presenter | string | The authorized presenter of the credential. This value should reflect the optional Authorized Presenter (`azp`) claim within a JWT or the OAuth2 client id. | 123456789012.my-svc.com |
-| request.api_key | string | The API key used for the request. | abcde12345 |
-| check.error_code | int64 | The error [code](https://github.com/google/protobuf/blob/master/src/google/protobuf/stubs/status.h#L44) for Mixer Check call. | 5 |
-| check.error_message | string | The error message for Mixer Check call. | Could not find the resource |
+| request.api_key | string | 用于请求的API key | abcde12345 |
+| check.error_code | int64 | Mixer Check 调用的[错误码](https://github.com/google/protobuf/blob/master/src/google/protobuf/stubs/status.h#L44). | 5 |
+| check.error_message | string | Mixer Check 调用的错误消息. | Could not find the resource |
 
