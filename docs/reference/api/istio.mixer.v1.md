@@ -40,7 +40,7 @@ source.ip: 192.168.0.1
 target.service: example
 ```
 
-每个给定的Istio部署有固定的能够理解的属性词汇表。这个特定的词汇表由当前部署中正在使用的属性生产者集合决定。Istio中首要的属性生产者是Envoy，然后特定的Mixer适配器和服务也会产生属性。
+每个给定的Istio部署有固定的能够理解的属性词汇。这个特定的词汇由当前部署中正在使用的属性生产者集合决定。Istio中首要的属性生产者是Envoy，然后特定的Mixer适配器和服务也会产生属性。
 
 在大多数Istio部署中，可用的通用基准属性集在[这里](../config/mixer/attribute-vocabulary.md)定义。
 
@@ -119,16 +119,104 @@ target.service: example
 
 ### CompressedAttributes
 
-定义压缩格式的属性列表，用于传输优化。使用这个消息，用这个消息，
+定义压缩格式的属性列表，用于传输优化。在此消息中，使用整数索引将字符串引用到两个字符串字典之一。 正整数索引到全局部署级字典，而负整数索引到消息级字典。 消息级字典由此消息的`words`字段携带，部署级字典通过配置确定。
 
-| 字段         | 类型                                                         | 描述                                       |
-| ------------ | ------------------------------------------------------------ | ------------------------------------------ |
-| precondition | [CheckResponse.PreconditionResult](#CheckResponse.PreconditionResult) | 前置条件检查结果。                         |
-| quotas       | map< string, [CheckResponse.QuotaResult](#CheckResponse.QuotaResult) > | 与此产生的配额，每个请求的配额对应一个条目 |
+| 字段         | 类型                                                         | 描述                                               |
+| ------------ | ------------------------------------------------------------ | -------------------------------------------------- |
+| `words`      | `string[]`                                                   | 消息级字典。                                       |
+| `strings`    | `map<int32, int32>`                                          | 持有STRING, DNS*NAME, EMAIL*ADDRESS, URI类型的属性 |
+| `int64s`     | `map<int32, int64>`                                          | 持有INT64类型的属性                                |
+| `doubles`    | `map<int32, double>`                                         | 持有DOUBLE类型的属性                               |
+| `bools`      | `map<int32, bool>`                                           | 持有BOOL类型的属性                                 |
+| `timestamps` | map< int32, [google.protobuf.Timestamp](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#timestamp) > | 持有TIMESTAMP类型的属性                            |
+| `durations`  | map< int32, [google.protobuf.Duration](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#duration) > | 持有DURATION类型的属性                             |
+| `bytes`      | `map<int32, bytes>`                                          | 持有BYTES类型的属性                                |
+| `stringMaps` | `map<int32, StringMap>`                                      | 持有STRING_MAP类型的属性                           |
 
+### ReferencedAttributes
 
+描述用于决定应答的属性。这可以用来构建应答的缓存。
 
+| 字段               | 类型                                                         | 描述                                                         |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `words`            | `string[]`                                                   | 消息级别字典。参考 [CompressedAttributes](#CompressedAttributes) 获取使用字典的信息。 |
+| `attributeMatches` | [ReferencedAttributes.AttributeMatch[]](#ReferencedAttributes.AttributeMatch) | 描述属性集合。                                               |
 
+### ReferencedAttributes.AttributeMatch
 
+描述单个属性的匹配情况。
 
+| 字段        | 类型                                                         | 描述                                                         |
+| ----------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `name`      | `int32`                                                      | 属性的名称。这是字典索引，编码方式和 [CompressedAttributes](#CompressedAttributes) 消息中所有的字符串一致。 |
+| `condition` | [ReferencedAttributes.Condition](#ReferencedAttributes.Condition) | 属性值的匹配类型。                                           |
+| `regex`     | `string`                                                     | 如果属性是STRING_MAP类型，condition是REGEX，则客户端应使用正则表达式值来匹配map key。 |
+| `mapKey`    | `int32`                                                      | STRINGMAP中的key。当一个STRINGMAP属性的多个key被引用时，会有多个AttributeMatch消息，带有不同的mapkey值。如果属性不是STRING_MAP类型，mapKey的值应该被忽略。<br>使用key的索引（从`words`字段而来的消息字典中来，或者从全局字典中来）。<br>如果属性是STRINGMAP类型，又没有提供mapKey的值，则将使用整个STRING_MAP。 |
 
+### ReferencedAttributes.Condition
+
+属性的值是如何匹配的。
+
+| 名称                    | 描述                                 |
+| ----------------------- | ------------------------------------ |
+| `CONDITION_UNSPECIFIED` | 不应该发生                           |
+| `ABSENCE`               | 当属性不存在时匹配                   |
+| `EXACT`                 | 当属性的值是精确的每个字节匹配时匹配 |
+| REGEX                   | 当属性的值匹配包含的正则表达式时匹配 |
+
+### ReportRequest
+
+用于在执行一个或者多个操作之后报告遥测。
+
+| 字段            | 类型                                             | 描述                                                         |
+| --------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| `attributes`    | [CompressedAttributes[\]](#CompressedAttributes) | 用于这次报告的属性。<br>每个 `Attributes` 元素代表单个操作的状态。多个操作可以在单条消息中提供来提供通讯效率。客户端可以积累多个操作，然后在单条消息中将他们都发送出去。 |
+| `defaultWords`  | `string[]`                                       | 用于所有属性的默认消息级别字典。单个属性消息可以有他们自己的字典，但是如果他们没有，则如果这个词语集合被提供，就可以替代使用。 |
+| globalWordCount | uint32                                           | 全局字典中词语的数量。用来检测客户端和服务器端之间的全局字典是否不同步。 |
+
+### ReportResponse
+
+用来携带对遥测报告的应答。
+
+> 注：这个消息是空消息，没有字段。
+
+### StringMap
+
+string到string的map。在这个map中，key和value都是字典索引（查看 [Attributes](#CompressedAttributes) 消息来获取解释）。
+
+| 字段      | 类型                | 描述                  |
+| --------- | ------------------- | --------------------- |
+| `entries` | `map<int32, int32>` | 持有名称/值对的集合。 |
+
+### google.rpc.Status
+
+`Status` 类型定义逻辑错误模型，适用于不同的编程环境，包括REST API和RPC API。用于[gRPC](https://github.com/grpc)。错误模型设计为：
+
+- 对于大多数用户，可以简单的使用和理解
+- 足够弹性来应对意外需求
+
+#### 概述
+
+`Status` 消息包含三块数据：错误码，错误消息和错误详情。错误码是*google.rpc.Code*的枚举值，但是在需要是可以接受额外的错误码。错误消息应该是面对开发人员的英语消息，帮助开发人员理解和解决错误。如果需要本地化的面对用户的错误消息，在错误详情中放置本地化的消息，或者在客户端做本地化。可选的错误详情可以包含有关错误的任意信息。在包 `google.rpc` 中有预定义定义的错误详情类型，可以用于常见错误条件。
+
+### 语言映射
+
+`Status` 消息是错误模型的逻辑表示，但是它不一定是实际的格式。当 `Status` 消息在不同的客户端类库和不同的协议中暴露时，它可以有不同的映射。例如，在java中它可能映射到某些异常，但是在C中更多的映射到某些错误代码。
+
+### 其他使用
+
+错误模型和`Status` 消息可以在不同的环境中使用，无论带或者不带API，以便在不同环境下提供一致的开发体验。
+
+这个错误模型的使用例子包括：
+
+- 部分错误。如果服务需要返回部分错误给客户端，它可以在正常的应答中嵌入 Status 。
+- 工作流错误。典型的工作量有多个步骤。每个步骤需要有一个`Status` 消息用来错误报告。
+- 批量操作。如果客户端采用批量请求和批量应答，`Status` 消息可以直接在批量应答直接使用。
+- 异步操作。如果一个API调用将异步操作结果内嵌到它的响应中，则这些操作的状态应该使用`Status` 消息直接表述。
+- 日志。如果某些API错误被存储在日志中，`Status` 消息可以在脱敏之后直接使用，脱敏是出于必要的安全和隐私原因。
+
+| 字段    | 类型                                                         | 描述                                                         |
+| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| code    | int32                                                        | 状态码，必须是` google.rpc.Code`的枚举值                     |
+| message | string                                                       | 面向开发者的错误信息，应该用英文。任何对象用户的错误信息应该本地化然后在 [google.rpc.Status.details](#google.rpc.Status.details) 字段中发送，或者由客户端进行本地化。 |
+| details | [google.protobuf.Any](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#any) | 携带错误详情的消息列表。有通用的消息类型集合给API使用        |
