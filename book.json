@@ -15,22 +15,13 @@
   "plugins": [
     "splitter",
     "-search",
-    "search-plus",
     "-sharing",
-    "edit-link",
-    "page-toc-button",
-    "back-to-top-button",
-    "github-buttons@2.1.0"
+    "edit-link"
   ],
   "pluginsConfig": {
     "edit-link": {
         "base": "https://github.com/doczhcn/istio/edit/master",
         "label": "在线编辑"
-    },
-    "github-buttons": {
-        "repo": "doczhcn/istio",
-        "types": ["star"],
-        "size": "small"
     }
   },
   "title": "Istio官方文档中文版",
@@ -38,7 +29,7 @@
     "adapterConfig": "/docs/reference/config/mixer/adapters",
     "aspectConfig": "/docs/reference/config/mixer/aspects",
     "mixerConfig": "/docs/reference/config/mixer/aspects/metrics.md",
-    "siteDataIstioVersion": "0.2",
+    "siteDataIstioVersion": "0.7",
     "home": "https://istio.io"
   }
 }
