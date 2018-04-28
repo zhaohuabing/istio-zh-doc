@@ -68,3 +68,8 @@
     * [深入遥测](docs/guides/telemetry.md)
     * [集成虚拟机](docs/guides/integrating-vms.md)
 * [参考文档](docs/reference/index.md)
+    * [API](docs/reference/api/index.md)
+        * [Mixer](docs/reference/api/istio.mixer.v1.md)
+    * [配置](docs/reference/config/index.md)
+    	* [Mixer](docs/reference/config/mixer/index.md)	
+        	* [属性词汇](docs/reference/config/mixer/attribute-vocabulary.md)
