@@ -109,6 +109,7 @@ BookInfo示例部署了三个版本的reviews服务，因此需要设置一个�
    ```bash
    istioctl get routerule reviews-test-v2 -o yaml
    ```
+
    ```yaml
    apiVersion: config.istio.io/v1alpha2
    kind: RouteRule
