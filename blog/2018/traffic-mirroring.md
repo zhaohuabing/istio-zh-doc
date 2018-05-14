@@ -1,16 +1,17 @@
-# Traffic Mirroring with Istio for Testing in Production
+# 使用 Istio 复制流量，用于生产环境的测试
 
-> An introduction to safer, lower-risk deployments and release to production
+> HTTP 流量的路由规则之一
 
-作者：Christian Posta
+作者：Cristian Posta
 
-原文地址：https://istio.io/blog/2018/traffic-mirroring.html
+原文地址：[https://istio.io/blog/2018/traffic-mirroring.html](https://istio.io/blog/2018/traffic-mirroring.html)
 
-Trying to enumerate all the possible combinations of test cases for testing services in non-production/test environments can be daunting. In some cases, you'll find that all of the effort that goes into cataloging these use cases doesn't match up to real production use cases. Ideally, we could use live production use cases and traffic to help illuminate all of the feature areas of the service under test that we might miss in more contrived testing environments.
 
-Istio can help here. With the release of [Istio 0.5.0]({{home}}/about/notes/0.5.html), Istio can mirror traffic to help test your services. You can write route rules similar to the following to enable traffic mirroring:
+在测试环境或者其他的非生产环境下，要穷举所有案例的可能组合，是一个令人望而却步的高难度任务。有时候我们甚至会发现，在用例分类和组合方面进行大量投入后，仍然无法反应真实环境的实际情况。设想，如果我们具有使用生产环境的真实流量作为测试案例的能力的话，就能够更好的帮我们覆盖到在测试环境中未能涉及的盲点。
 
-```yaml
+Istio 就提供了这样的能力。在 [Istio 0.5.0](https://istio.io/blog/2018/traffic-mirroring.html) 中，加入了流量镜像功能，这一功能对测试工作很有帮助。可以使用路由规则来实现流量的复制：
+
+~~~yaml
 apiVersion: config.istio.io/v1alpha2
 kind: RouteRule
 metadata:
@@ -23,20 +24,19 @@ spec:
   - labels:
       version: v1
     weight: 100
-  - labels:
+  - labels: 
       version: v2
     weight: 0
   mirror:
     name: httpbin
     labels:
       version: v2
-```
+~~~
 
-A few things to note here:
+这里有几点需要注意的：
 
-* When traffic gets mirrored to a different service, that happens outside the critical path of the request
-* Responses to any mirrored traffic is ignored; traffic is mirrored as "fire-and-forget"
-* You'll need to have the 0-weighted route to hint to Istio to create the proper Envoy cluster under the covers; [this should be ironed out in future releases](https://github.com/istio/istio/issues/3270).
+- 只有非关键流量被镜像到其他服务（主要指的是 Istio 相关的跟踪 Tag）。
+- 目标服务对于镜像流量的响应会被忽略；流量的镜像过程是一种发过即弃的过程。
+- 要创建一条权重为 0 的 Istio 路由规则，让 Envoy 集群进行初始化，[未来版本会改善这一问题](https://github.com/istio/istio/issues/3270)。
 
-Learn more about mirroring by visiting the [Mirroring Task]({{home}}/docs/tasks/traffic-management/mirroring.html) and see a more
-[comprehensive treatment of this scenario on my blog](https://blog.christianposta.com/microservices/traffic-shadowing-with-istio-reduce-the-risk-of-code-release/).
+可以阅读 [Mirror Task](../../docs/tasks/traffic-management/mirroring.html)，并在[我的博客](https://blog.christianposta.com/microservices/traffic-shadowing-with-istio-reduce-the-risk-of-code-release/)上做一些这方面的深入了解。
