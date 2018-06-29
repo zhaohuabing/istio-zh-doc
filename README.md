@@ -1,38 +1,13 @@
 # Istio官方文档中文版
 
-## 介绍
+**注意**：该文档已经停止维护，部分内容已经过时，请移步 [Istio 官方文档中文页面](https://preliminary.istio.io/zh/)。
 
-[Istio](https://istio.io)是由Google/IBM/Lyft共同开发的新一代Service Mesh开源项目。
+Istio 官方文档的汉化工作请移步：[istio-official-translation](https://github.com/servicemesher/istio-official-translation)
 
-这是[Istio官方文档](https://istio.io/docs/)的中文翻译版，由Service Mesh中国社区组织翻译并更新维护。
+## Service Mesh爱好者社区
 
-文档内容发布于gitbook，请点击下面的链接阅读或者下载电子版本:
+为了加强行业内部交流，推动 Service Mesh 技术的发展和落地，我们组建了 [ServiceMesher 社区](http://www.servicemesher.com/)，欢迎加入。
 
-- 在线阅读
-	- [国外服务器][gitbook]：gitbook提供的托管，服务器在国外，速度比较慢，偶尔被墙，HTTPS
-	- [国内服务器][qcloud]：腾讯云加速，国内网速极快，非HTTPS
-- [下载pdf格式][istio-pdf]
-- [下载mobi格式][istio-mobi]
-- [下载epub格式][istio-epub]
+您可以通过 [Awesome Service Mesh](http://www.servicemesher.com/awesome-servicemesh/) 资料清单快速了解 Service Mesh 技术和相关的 Istio、Envoy、Linkerd等开源项目，该清单由 ServiceMesher 社区更新维护。
 
-本文内容可以任意转载，但是需要注明来源并提供链接。
-
-**请勿用于商业出版**。
-
-## Service Mesh中国
-
-目前Service Mesh技术还比较新颖，为了方便技术交流，我们组建了Service Mesh中国社区，欢迎加入：
-
-http://www.servicemesh.cn/
-
-您可以通过Awesome Service Mesh资料清单快速了解Service Mesh技术和相关的Istio/linkerd等开源项目，这份清单由Service Mesh中国社区更新维护：
-
-https://servicemesh.gitbooks.io/awesome-servicemesh/
-
-如果想加入Service Mesh中国社区的微信群，请联系微信ID `xiaoshu062` ，注明“服务网格”。
-
-[gitbook]: https://doczhcn.gitbooks.io/istio/
-[qcloud]: http://istio.doczh.cn/
-[istio-pdf]: https://www.gitbook.com/download/pdf/book/doczhcn/istio
-[istio-mobi]: https://www.gitbook.com/download/mobi/book/doczhcn/istio
-[istio-epub]: https://www.gitbook.com/download/epub/book/doczhcn/istio
+如果想加入 ServiceMesher 社区的微信群，请联系[管理员](https://jimmysong.io/about)，注明”姓名-公司“。
