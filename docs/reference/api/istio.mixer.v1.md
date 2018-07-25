@@ -104,8 +104,10 @@ target.service: example
 | status               | [google.rpc.Status](#google.rpc.Status)                      | 状态码OK表示所有前置条件均满足。任何其它状态码表示不是所有的前置条件都满足，并且在detail中描述为什么。 |
 | validDuration        | [google.protobuf.Duration](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#duration) | 时间量，在此期间这个结果可以认为是有效的                     |
 | validUseCount        | int32                                                        | 可使用的次数，在此期间这个结果可以认为是有效的               |
-| attributes           | [CompressedAttributes](#CompressedAttributes)                | mixer返回的属性。<br>返回的切确属性集合由mixer配置的adapter决定。这些属性用于传送新属性，这些新属性是Mixer根据输入的属性集合和它的配置派生的。 |
 | referencedAttributes | [ReferencedAttributes](#ReferencedAttributes)                | 在匹配条件并生成结果的过程中使用到的全部属性集合。           |
+| routeDirective       | [RouteDirective](#RouteDirective)                            | 可选的路由指令，用于所有前提条件满足时操作流量元数据。       |
+
+> 译者备注：0.8版本之后这里有改动，删除了attributes字段，增加了routeDirective字段。
 
 ### CheckResponse.QuotaResult
 
@@ -132,6 +134,26 @@ target.service: example
 | `durations`  | map< int32, [google.protobuf.Duration](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#duration) > | 持有DURATION类型的属性                             |
 | `bytes`      | `map<int32, bytes>`                                          | 持有BYTES类型的属性                                |
 | `stringMaps` | `map<int32, StringMap>`                                      | 持有STRING_MAP类型的属性                           |
+
+### HeaderOperation
+
+HTTP headr操作，进行替换，追加或删除header。Header名称用短划线标准化为小写，例如“X-request-id”。伪报头":path"，":authority"，和":method"支持修改请求header。
+
+| 字段      | 类型                      | 描述       |
+| --------- | ------------------------- | ---------- |
+| name      | string                    | header名称 |
+| value     | string                    | header值   |
+| operation | HeaderOperation.Operation | header操作 |
+
+### HeaderOperation.Operation
+
+操作类型。
+
+| 名称    | 描述                                     |
+| ------- | ---------------------------------------- |
+| REPLACE | 通过给定的名字替换header                 |
+| REMOVE  | 通过给定的名字（值被忽略）删除header     |
+| APPEND  | 追加值到header值，或者如果不存在则设置值 |
 
 ### ReferencedAttributes
 

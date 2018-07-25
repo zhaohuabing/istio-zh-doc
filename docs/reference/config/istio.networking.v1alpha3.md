@@ -1,22 +1,22 @@
-# Route Rules Alpha 3
+Route Rules Alpha 3
 
-Configuration affecting traffic routing. Here are a few terms useful to define in the context of traffic routing.
+关系到流量路由的配置。这里有几个很有用的术语，它们在流量路由的上下文中定义。
 
-*Service* a unit of application behavior bound to a unique name in a service registry. Services consist of multiple network *endpoints* implemented by workload instances running on pods, containers, VMs etc.
+`服务/Service` - 应用行为单元，绑定到服务注册表中的唯一名称。服务由多个网络端点组成，这些端点由运行在 pod，容器，虚拟机等上的工作负载实例实现。
 
-*Service versions (subsets)* - In a continuous deployment scenario, for a given service, there can be distinct subsets of instances running different variants of the application binary. These variants are not necessarily different API versions. They could be iterative changes to the same service, deployed in different environments (prod, staging, dev, etc.). Common scenarios where this occurs include A/B testing, canary rollouts, etc. The choice of a particular version can be decided based on various criterion (headers, url, etc.) and/or by weights assigned to each version. Each service has a default version consisting of all its instances.
+`服务版本(子集)/Service versions (subsets)` - 在持续部署场景中，对于给定的服务，可以有不同的实例子集，分别运行应用程序二进制的不同变体。这些变体不一定是不同的API版本。他们可以是同一服务的迭代更改，部署在不同的环境中（prod，staging，dev等）。发生这种情况的常见情景包括A / B测试，金丝雀推出等。特定版本的选择可以基于各种标准（headers，url等）和/或通过分配给每个版本的权重来决定。每个服务都有一个由其所有实例组成的默认版本。
 
-*Source* - A downstream client calling a service.
+`源/Source` - 调用服务的下游客户端。
 
-*Host* - The address used by a client when attempting to connect to a service.
+`主机/Host` - 客户端尝试连接服务时使用的地址。
 
-*Access model* - Applications address only the destination service (Host) without knowledge of individual service versions (subsets). The actual choice of the version is determined by the proxy/sidecar, enabling the application code to decouple itself from the evolution of dependent services.
+`访问模式/Access model` - 应用程序只寻址目标服务（主机）而无需了解单个服务版本（子集）。版本的实际选择取决于代理/sidecar，从而使应用程序代码能够将其本身从依赖服务的演变中解耦出来。
 
 ## ConnectionPoolSettings
 
-Connection pool settings for an upstream host. The settings apply to each individual host in the upstream service. See Envoy’s [circuit breaker](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/circuit_breaking) for more details. Connection pool settings can be applied at the TCP level as well as at HTTP level.
+上游主机的连接池设置。这些设置适用于上游服务中的每台主机。更多详细信息，请参阅 Envoy 的 [断路器](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/circuit_breaking) 。连接池设置可以应用在 TCP 级别以及 HTTP 级别。
 
-For example, the following rule sets a limit of 100 connections to redis service called myredissrv with a connect timeout of 30ms
+例如，以下规则设置到被称为 myredissrv 的 redis 服务的连接限制为100，连接超时为30ms
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -32,34 +32,34 @@ spec:
         connectTimeout: 30ms
 ```
 
-| Field  | Type                                  | Description                                                |
-| ------ | ------------------------------------- | ---------------------------------------------------------- |
-| `tcp`  | `ConnectionPoolSettings.TCPSettings`  | Settings common to both HTTP and TCP upstream connections. |
-| `http` | `ConnectionPoolSettings.HTTPSettings` | HTTP connection pool settings.                             |
+| 字段   | 类型                                  | 描述                          |
+| ------ | ------------------------------------- | ----------------------------- |
+| `tcp`  | `ConnectionPoolSettings.TCPSettings`  | HTTP和TCP上游连接的通用设置。 |
+| `http` | `ConnectionPoolSettings.HTTPSettings` | HTTP 连接池设置。             |
 
 ## ConnectionPoolSettings.HTTPSettings
 
-Settings applicable to HTTP1.1/HTTP2/GRPC connections.
+适用于 HTTP1.1/HTTP2/GRPC 连接的配置.
 
-| Field                      | Type    | Description                                                  |
+| 字段                       | 类型    | 描述                                                         |
 | -------------------------- | ------- | ------------------------------------------------------------ |
-| `http1MaxPendingRequests`  | `int32` | Maximum number of pending HTTP requests to a destination. Default 1024. |
-| `http2MaxRequests`         | `int32` | Maximum number of requests to a backend. Default 1024.       |
-| `maxRequestsPerConnection` | `int32` | Maximum number of requests per connection to a backend. Setting this parameter to 1 disables keep alive. |
-| `maxRetries`               | `int32` | Maximum number of retries that can be outstanding to all hosts in a cluster at a given time. Defaults to 3. |
+| `http1MaxPendingRequests`  | `int32` | 对目标的最大挂起HTTP请求数。默认1024。                       |
+| `http2MaxRequests`         | `int32` | 对后端的最大请求数。默认1024。                               |
+| `maxRequestsPerConnection` | `int32` | 每个到后端的连接的最大请求数。将此参数设置为1将禁用keep alive。 |
+| `maxRetries`               | `int32` | 给定时间内，集群中所有主机的最大重试次数。默认为3。          |
 
 ## ConnectionPoolSettings.TCPSettings
 
-Settings common to both HTTP and TCP upstream connections.
+HTTP 和 TCP 上游连接通用的配置.
 
-| Field            | Type                       | Description                                                  |
-| ---------------- | -------------------------- | ------------------------------------------------------------ |
-| `maxConnections` | `int32`                    | Maximum number of HTTP1 /TCP connections to a destination host. |
-| `connectTimeout` | `google.protobuf.Duration` | TCP connection timeout.                                      |
+| 字段             | 类型                       | 描述                                  |
+| ---------------- | -------------------------- | ------------------------------------- |
+| `maxConnections` | `int32`                    | 到目标主机的 HTTP1 / TCP 最大连接数。 |
+| `connectTimeout` | `google.protobuf.Duration` | TCP 连接超时时间。                    |
 
 ## CorsPolicy
 
-Describes the Cross-Origin Resource Sharing (CORS) policy, for a given service. Refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Access*control*CORS for further details about cross origin resource sharing. For example, the following rule restricts cross origin requests to those originating from example.com domain using HTTP POST/GET, and sets the Access-Control-Allow-Credentials header to false. In addition, it only exposes X-Foo-bar header and sets an expiry period of 1 day.
+描述给定服务的跨源资源共享（CORS）策略。有关跨源资源共享的更多详细信息，请参阅https://developer.mozilla.org/en-US/docs/Web/HTTP/AccesscontrolCORS。例如，以下规则将使用 HTTP POST / GET 的跨源请求限制为源自example.com域的跨源请求，并将 Access-Control-Allow-Credentials header设置为false。此外，它只暴露 X-Foo-bar header 并设置1天的到期时间。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -86,32 +86,32 @@ spec:
       maxAge: "1d"
 ```
 
-| Field              | Type                        | Description                                                  |
+| 字段               | 类型                        | 描述                                                         |
 | ------------------ | --------------------------- | ------------------------------------------------------------ |
-| `allowOrigin`      | `string[]`                  | The list of origins that are allowed to perform CORS requests. The content will be serialized into the Access-Control-Allow-Origin header. Wildcard * will allow all origins. |
-| `allowMethods`     | `string[]`                  | List of HTTP methods allowed to access the resource. The content will be serialized into the Access-Control-Allow-Methods header. |
-| `allowHeaders`     | `string[]`                  | List of HTTP headers that can be used when requesting the resource. Serialized to Access-Control-Allow-Methods header. |
-| `exposeHeaders`    | `string[]`                  | A white list of HTTP headers that the browsers are allowed to access. Serialized into Access-Control-Expose-Headers header. |
-| `maxAge`           | `google.protobuf.Duration`  | Specifies how long the the results of a preflight request can be cached. Translates to the Access-Control-Max-Age header. |
-| `allowCredentials` | `google.protobuf.BoolValue` | Indicates whether the caller is allowed to send the actual request (not the preflight) using credentials. Translates to Access-Control-Allow-Credentials header. |
+| `allowOrigin`      | `string[]`                  | 允许执行CORS请求的来源列表。内容将被序列化到Access-Control-Allow-Origin header中。通配符 `*` 将允许所有的来源。 |
+| `allowMethods`     | `string[]`                  | 允许访问资源的 HTTP 方法列表。内容将被序列化到 Access-Control-Allow-Methods header中。 |
+| `allowHeaders`     | `string[]`                  | 请求资源时可以使用的 HTTP header 列表。序列化为 Access-Control-Allow-Headers header。 |
+| `exposeHeaders`    | `string[]`                  | 浏览器允许访问的 HTTP header 白名单。序列化到 Access-Control-Expose-Headers header。 |
+| `maxAge`           | `google.protobuf.Duration`  | 指定预检请求结果可以缓存的时间长度。转换为 Access-Control-Max-Age header。 |
+| `allowCredentials` | `google.protobuf.BoolValue` | 指示是否允许调用方使用证书发送实际请求（不是预检）。转换为 Access-Control-Allow-Credentials header。 |
 
 ## Destination
 
-Destination indicates the network addressable service to which the request/connection will be sent after processing a routing rule. The destination.name should unambiguously refer to a service in the service registry. It can be a short name or a fully qualified domain name from the service registry, a resolvable DNS name, an IP address or a service name from the service registry and a subset name. The order of inference is as follows:
+目的地指示网络可寻址服务，在处理路由规则后将请求/连接发送到这些服务。`destination.host` 应明确引用到服务注册中的服务。Istio的服务注册由平台服务注册（例如Kubernetes服务，Consul服务）中的所有服务以及通过[ServiceEntry](#ServiceEntry)资源声明的服务组成。
 
-1. Service registry lookup. The entire name is looked up in the service registry. If the lookup succeeds, the search terminates. The requests will be routed to any instance of the service in the mesh. When the service name consists of a single word, the FQDN will be constructed in a platform specific manner. For example, in Kubernetes, the namespace associated with the routing rule will be used to identify the service as .. However, if the service name contains multiple words separated by a dot (e.g., reviews.prod), the name in its entirety would be looked up in the service registry.
-2. Runtime DNS lookup by the proxy. If step 1 fails, and the name is not an IP address, it will be considered as a DNS name that is not in the service registry (e.g., wikipedia.org). The sidecar/gateway will resolve the DNS and load balance requests appropriately. See Envoy’s strict_dns for details.
+Kubernetes用户请注意：当使用短名称（例如“reviews”而不是“reviews.default.svc.cluster.local”）时，Istio将根据规则的命名空间解释短名称，而不是服务的命名空间。在"default"命名空间中包含主机“reviews”的规则将被解释为“reviews.default.svc.cluster.local”，而不管与review服务相关联的实际命名空间。为避免可能的错误配置，建议始终使用完全限定域名而不是短名称。
 
-The following example routes all traffic by default to pods of the reviews service with label “version: v1” (i.e., subset v1), and some to subset v2, in a kubernetes environment.
+以下示例默认将所有流量路由到reviews服务的标签为“version：v1”（即子集v1）的pod，其中一些流量为v2子集，在kubernetes环境中。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: reviews-route
+  namespace: foo
 spec:
   hosts:
-  - reviews # namespace is same as the client/caller's namespace
+  - reviews # 解释为 reviews.foo.svc.cluster.local
   http:
   - match:
     - uri:
@@ -122,23 +122,24 @@ spec:
       uri: "/newcatalog"
     route:
     - destination:
-        name: reviews
+        host: reviews # 解释为 reviews.foo.svc.cluster.local
         subset: v2
   - route:
     - destination:
-        name: reviews
+        host: reviews # 解释为 reviews.foo.svc.cluster.local
         subset: v1
 ```
 
-And the associated DestinationRule
+而关联的 DestinationRule
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: reviews-destination
+  namespace: foo
 spec:
-  name: reviews
+  host: reviews # 解释为 reviews.foo.svc.cluster.local
   subsets:
   - name: v1
     labels:
@@ -148,26 +149,41 @@ spec:
       version: v2
 ```
 
-The following VirtualService sets a timeout of 5s for all calls to productpage.prod service. Notice that there are no subsets defined in this rule. Istio will fetch all instances of productpage.prod service from the service registry and populate the sidecar’s load balancing pool.
+以下 VirtualService 为 Kubernetes 中的 productpage.prod.svc.cluster.local 服务的所有调用设置5秒的超时时间。请注意，此规则中没有定义子集。Istio 将从服务注册中获取所有的 productpage.prod.svc.cluster.local 的服务实例，并填充 sidecar 的负载平衡池。另请注意，此规则在 istio-system 命名空间中设置，但使用 productpage 服务的完全限定域名productpage.prod.svc.cluster.local。因此，规则的名称空间不会影响到 productpage 服务名称的解析。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: my-productpage-rule
+  namespace: istio-system
 spec:
   hosts:
-  - productpage.prod # in kubernetes, this applies only to prod namespace
+  - productpage.prod.svc.cluster.local # 忽略规则命名空间
   http:
   - timeout: 5s
     route:
     - destination:
-        name: productpage.prod
+        host: productpage.prod.svc.cluster.local
 ```
 
-The following sets a timeout of 5s for all calls to the external service wikipedia.org, as there is no internal service of that name.
+要控制绑定到网格外服务的流量路由，必须先使用 ServiceEntry 资源将外部服务添加到 Istio 的内部服务注册中。然后可以定义 VirtualServices 来控制绑定到这些外部服务的流量。例如，以下规则定义 wikipedia.org 的服务并为 http 请求设置5秒的超时时间。
 
 ```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-svc-wikipedia
+spec:
+  hosts:
+  - wikipedia.org
+  location: MESH_EXTERNAL
+  ports:
+  - number: 80
+    name: example-http
+    protocol: HTTP
+  resolution: DNS
+
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
@@ -179,18 +195,19 @@ spec:
   - timeout: 5s
     route:
     - destination:
-        name: wikipedia.org
+        host: wikipedia.org
+
 ```
 
-| Field    | Type           | Description                                                  |
+| 字段     | 类型           | 描述                                                         |
 | -------- | -------------- | ------------------------------------------------------------ |
-| `name`   | `string`       | REQUIRED. The name can be a short name or a fully qualified domain name from the service registry, a resolvable DNS name, or an IP address.If short names are used, the FQDN of the service will be resolved in a platform specific manner. For example in Kubernetes, when a route with a short name “reviews” in the destination in namespace “bookinfo” is applied, the final destination is resolved to reviews.bookinfo.svc.cluster.local. The sidecar will route to the IP addresses of the pods constituting the service. However, if the lookup fails, “reviews” is treated as an external service, such that the sidecar will dynamically resolve the DNS of the service name and route the request to the IP addresses returned by the DNS. |
-| `subset` | `string`       | The name of a subset within the service. Applicable only to services within the mesh. The subset must be defined in a corresponding DestinationRule. |
-| `port`   | `PortSelector` | Specifies the port on the destination. Many services only expose a single port or label ports with the protocols they support, in these cases it is not required to explicitly select the port. Note that selection priority is to first match by name and then match by number.Names must comply with DNS label syntax (rfc1035) and therefore cannot collide with numbers. If there are multiple ports on a service with the same protocol the names should be of the form-. |
+| `host`   | `string`       | 必填. 服务注册表服务的名称。从平台的服务注册（例如Kubernetes服务，Consul服务等）和ServiceEntry声明的主机中查找服务名称。如果在两者中找不到目的地，则转发到该目的地的流量将被丢弃。<br />Kubernetes用户请注意：当使用短名称（例如“reviews”而不是“reviews.default.svc.cluster.local”）时，Istio将根据规则的命名空间解释短名称，而不是服务的命名空间。在"default"命名空间中包含主机“reviews”的规则将被解释为“reviews.default.svc.cluster.local”，而不管与review服务相关联的实际命名空间。为避免可能的错误配置，建议始终使用完全限定域名而不是短名称。 |
+| `subset` | `string`       | 服务中子集的名称。 仅适用于网格内的服务。该子集必须在相应的 DestinationRule 中定义。 |
+| `port`   | `PortSelector` | 指定要寻址的主机上的端口。如果服务仅公开单个端口，则不需要显式选择端口。 |
 
 ## DestinationRule
 
-DestinationRule defines policies that apply to traffic intended for a service after routing has occurred. These rules specify configuration for load balancing, connection pool size from the sidecar, and outlier detection settings to detect and evict unhealthy hosts from the load balancing pool. For example, a simple load balancing policy for the ratings service would look as follows:
+`DestinationRule` 定义策略， 这些策略适用于在路由发生之后准备用于服务的流量。这些规则指定负载均衡的配置，来自sidecar的连接池大小和异常值检测设置，以检测并逐出负载均衡池中的不健康主机。例如，ratings服务的简单负载均衡策略如下所示：
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -198,13 +215,13 @@ kind: DestinationRule
 metadata:
   name: bookinfo-ratings
 spec:
-  name: ratings
+  host: ratings.prod.svc.cluster.local
   trafficPolicy:
     loadBalancer:
       simple: LEAST_CONN
 ```
 
-Version specific policies can be specified by defining a named subset and overriding the settings specified at the service level. The following rule uses a round robin load balancing policy for all traffic going to a subset named testversion that is composed of endpoints (e.g., pods) with labels (version:v3).
+通过定义一个命名的子集并覆盖在服务级别指定的设置，可以指定特定于版本的策略。以下规则针对所有到达名为 testversion 子集的流量使用轮循(round robin)负载均衡策略，该子集由带有标签（version:v3）的端点（例如，pod）组成。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -212,7 +229,7 @@ kind: DestinationRule
 metadata:
   name: bookinfo-ratings
 spec:
-  name: ratings
+  host: ratings.prod.svc.cluster.local
   trafficPolicy:
     loadBalancer:
       simple: LEAST_CONN
@@ -225,17 +242,40 @@ spec:
         simple: ROUND_ROBIN
 ```
 
-Note that policies specified for subsets will not take effect until a route rule explicitly sends traffic to this subset.
+**注意：**在路由规则明确向此子集发送流量之前，为子集指定的策略不会生效。
 
-| Field           | Type            | Description                                                  |
+流量策略也可以定制为特定的端口。以下规则对所有到80端口的流量使用最小连接(least connection)负载均衡策略，而对到9080端口的流量使用轮循(round robin)负载均衡设置。
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: bookinfo-ratings-port
+spec:
+  host: ratings.prod.svc.cluster.local
+  trafficPolicy: # 适用于所有端口
+    portLevelSettings:
+    - port:
+        number: 80
+      loadBalancer:
+        simple: LEAST_CONN
+    - port:
+        number: 9080
+      loadBalancer:
+        simple: ROUND_ROBIN
+```
+
+| 字段            | 类型            | 描述                                                         |
 | --------------- | --------------- | ------------------------------------------------------------ |
-| `name`          | `string`        | REQUIRED. The destination address for traffic captured by this rule. Could be a DNS name with wildcard prefix or a CIDR prefix. Depending on the platform, short-names can also be used instead of a FQDN (i.e. has no dots in the name). In such a scenario, the FQDN of the host would be derived based on the underlying platform.For example on Kubernetes, when hosts contains a short name, Istio will interpret the short name based on the namespace of the rule. Thus, when a client applies a rule in the “default” namespace, containing a name “reviews”, Istio will setup routes to the “reviews.default.svc.cluster.local” service. However, if a different name such as “reviews.sales” is used, it would be treated as a FQDN during virtual host matching. In Consul, a plain service name would be resolved to the FQDN “reviews.service.consul”.Note that the hosts field applies to both HTTP and TCP services. Service inside the mesh, i.e. those found in the service registry, must always be referred to using their alphanumeric names. IP addresses or CIDR prefixes are allowed only for services defined via the Gateway. |
-| `trafficPolicy` | `TrafficPolicy` | Traffic policies to apply (load balancing policy, connection pool sizes, outlier detection). |
-| `subsets`       | `Subset[]`      | One or more named sets that represent individual versions of a service. Traffic policies can be overridden at subset level. |
+| `host`          | `string`        | 必填. 服务注册表服务的名称。从平台的服务注册（例如Kubernetes服务，Consul服务等）和ServiceEntry声明的主机中查找服务名称。如果在两者中找不到目的地，则转发到该目的地的流量将被丢弃。<br />Kubernetes用户请注意：当使用短名称（例如“reviews”而不是“reviews.default.svc.cluster.local”）时，Istio将根据规则的命名空间解释短名称，而不是服务的命名空间。在"default"命名空间中包含主机“reviews”的规则将被解释为“reviews.default.svc.cluster.local”，而不管与review服务相关联的实际命名空间。为避免可能的错误配置，建议始终使用完全限定域名而不是短名称。<br />请注意，host字段同时适用于HTTP和TCP服务。 |
+| `trafficPolicy` | `TrafficPolicy` | 要应用的流量策略（负载均衡策略，连接池大小，异常检测）。     |
+| `subsets`       | `Subset[]`      | 代表服务的单个版本的一个或多个命名集。流量策略可以在子集级别上被覆盖。 |
 
 ## DestinationWeight
 
 Each routing rule is associated with one or more service versions (see glossary in beginning of document). Weights associated with the version determine the proportion of traffic it receives. For example, the following rule will route 25% of traffic for the “reviews” service to instances with the “v2” tag and the remaining traffic (i.e., 75%) to “v1”.
+
+每个路由规则都与一个或多个服务版本相关联（请参阅文档开头的术语表）。与版本关联的权重决定了它收到的流量的比例。例如，以下规则将将“reviews”服务的25％的流量路由到具有“v2”标签的实例并将剩余流量（即75％）路由到“v1”。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -244,20 +284,20 @@ metadata:
   name: reviews-route
 spec:
   hosts:
-  - reviews
+  - reviews.prod.svc.cluster.local
   http:
   - route:
     - destination:
-        name: reviews
+        host: reviews.prod.svc.cluster.local
         subset: v2
       weight: 25
     - destination:
-        name: reviews
+        host: reviews.prod.svc.cluster.local
         subset: v1
       weight: 75
 ```
 
-And the associated DestinationRule
+而关联的 DestinationRule
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -265,7 +305,7 @@ kind: DestinationRule
 metadata:
   name: reviews-destination
 spec:
-  name: reviews
+  host: reviews.prod.svc.cluster.local
   subsets:
   - name: v1
     labels:
@@ -275,177 +315,40 @@ spec:
       version: v2
 ```
 
-| Field         | Type          | Description                                                  |
-| ------------- | ------------- | ------------------------------------------------------------ |
-| `destination` | `Destination` | REQUIRED. Destination uniquely identifies the instances of a service to which the request/connection should be forwarded to. |
-| `weight`      | `int32`       | REQUIRED. The proportion of traffic to be forwarded to the service version. (0-100). Sum of weights across destinations SHOULD BE == 100. If there is only destination in a rule, the weight value is assumed to be 100. |
+Traffic can also be split across two entirely different services without having to define new subsets. For example, the following rule forwards 25% of traffic to reviews.com to dev.reviews.com
 
-## ExternalService
-
-External service describes the endpoints, ports and protocols of a white-listed set of mesh-external domains and IP blocks that services in the mesh are allowed to access.
-
-For example, the following external service configuration describes the set of services at https://example.com to be accessed internally over plaintext http (i.e. http://example.com:443), with the sidecar originating TLS.
+流量也可以分成两个完全不同的服务，而不必定义新的子集。例如，以下规则将到 reviews.com 的25％的流量转发到dev.reviews.com
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
-kind: ExternalService
+kind: VirtualService
 metadata:
-  name: external-svc-example
+  name: reviews-route-two-domains
 spec:
   hosts:
-  - example.com
-  ports:
-  - number: 443
-    name: example-http
-    protocol: http # not HTTPS.
-  discovery: DNS
+  - reviews.com
+  http:
+  - route:
+    - destination:
+        host: dev.reviews.com
+      weight: 25
+    - destination:
+        host: reviews.com
+      weight: 75
 ```
 
-and a destination rule to initiate TLS connections to the external service.
 
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: tls-example
-spec:
-  name: example.com
-  trafficPolicy:
-    tls:
-      mode: SIMPLE # initiates HTTPS when talking to example.com
-```
 
-The following specification specifies a static set of backend nodes for a MongoDB cluster behind a set of virtual IPs, and sets up a destination rule to initiate mTLS connections upstream.
-
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: ExternalService
-metadata:
-  name: external-svc-mongocluster
-spec:
-  hosts:
-  - 192.192.192.192/24
-  ports:
-  - number: 27018
-    name: mongodb
-    protocol: mongo
-  discovery: STATIC
-  endpoints:
-  - address: 2.2.2.2
-  - address: 3.3.3.3
-```
-
-and the associated destination rule
-
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: mtls-mongocluster
-spec:
-  name: 192.192.192.192/24
-  trafficPolicy:
-    tls:
-      mode: MUTUAL
-      clientCertificate: /etc/certs/myclientcert.pem
-      privateKey: /etc/certs/client_private_key.pem
-      caCertificates: /etc/certs/rootcacerts.pem
-```
-
-The following example demonstrates the use of wildcards in the hosts. If the connection has to be routed to the IP address requested by the application (i.e. application resolves DNS and attempts to connect to a specific IP), the discovery mode must be set to “none”.
-
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: ExternalService
-metadata:
-  name: external-svc-wildcard-example
-spec:
-  hosts:
-  - "*.bar.com"
-  ports:
-  - number: 80
-    name: http
-    protocol: http
-  discovery: NONE
-```
-
-For HTTP based services, it is possible to create a virtual service backed by multiple DNS addressible endpoints. In such a scenario, the application can use the HTTP_PROXY environment variable to transparently reroute API calls for the virtual service to a chosen backend. For example, the following configuration creates a non-existent service called foo.bar.com backed by three domains: us.foo.bar.com:8443, uk.foo.bar.com:9443, and in.foo.bar.com:7443
-
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: ExternalService
-metadata:
-  name: external-svc-dns
-spec:
-  hosts:
-  - foo.bar.com
-  ports:
-  - number: 443
-    name: https
-    protocol: http
-  discovery: DNS
-  endpoints:
-  - address: us.foo.bar.com
-    ports:
-      https: 8443
-  - address: uk.foo.bar.com
-    ports:
-      https: 9443
-  - address: in.foo.bar.com
-    ports:
-      https: 7443
-```
-
-and a destination rule to initiate TLS connections to the external service.
-
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: tls-foobar
-spec:
-  name: foo.bar.com
-  trafficPolicy:
-    tls:
-      mode: SIMPLE # initiates HTTPS
-```
-
-With HTTP_PROXY=http://localhost:443, calls from the application to http://foo.bar.com will be upgraded to HTTPS and load balanced across the three domains specified above. In other words, a call to http://foo.bar.com/baz would be translated to https://uk.foo.bar.com/baz.
-
-NOTE: In the scenario above, the value of the HTTP Authority/host header associated with the outbound HTTP requests will be based on the endpoint’s DNS name, i.e. “:authority: uk.foo.bar.com”. Refer to Envoy’s auto*host*rewrite for further details. The automatic rewrite can be overridden using a host rewrite route rule.
-
-| Field       | Type                         | Description                                                  |
-| ----------- | ---------------------------- | ------------------------------------------------------------ |
-| `hosts`     | `string[]`                   | REQUIRED. The hosts associated with the external service. Could be a DNS name with wildcard prefix or a CIDR prefix. Note that the hosts field applies to all protocols. DNS names in hosts will be ignored if the application accesses the service over non-HTTP protocols such as mongo/opaque TCP/even HTTPS. In such scenarios, the port on which the external service is being accessed must not be shared by any other service in the mesh. In other words, the sidecar will behave as a simple TCP proxy, forwarding incoming traffic on a specified port to the specified destination endpoint IP/host. |
-| `ports`     | `Port[]`                     | REQUIRED. The ports associated with the external service.    |
-| `discovery` | `ExternalService.Discovery`  | Service discovery mode for the hosts. If not set, Istio will attempt to infer the discovery mode based on the value of hosts and endpoints. |
-| `endpoints` | `ExternalService.Endpoint[]` | One or more endpoints associated with the service. Endpoints must be accessible over the set of outPorts defined at the service level. |
-
-## ExternalService.Discovery
-
-Different ways of discovering the IP addresses associated with the service.
-
-| Name     | Description                                                  |
-| -------- | ------------------------------------------------------------ |
-| `NONE`   | If set to “none”, the proxy will assume that incoming connections have already been resolved (to a specific destination IP address). Such connections are typically routed via the proxy using mechanisms such as IP table REDIRECT/ eBPF. After performing any routing related transformations, the proxy will forward the connection to the IP address to which the connection was bound. |
-| `STATIC` | If set to “static”, the proxy will use the IP addresses specified in endpoints (See below) as the backing nodes associated with the external service. |
-| `DNS`    | If set to “dns”, the proxy will attempt to resolve the DNS address during request processing. If no endpoints are specified, the proxy will resolve the DNS address specified in the hosts field, if wildcards are not used. If endpoints are specified, the DNS addresses specified in the endpoints will be resolved to determine the destination IP address. |
-
-## ExternalService.Endpoint
-
-Endpoint defines a network address (IP or hostname) associated with the external service.
-
-| Field     | Type                  | Description                                                  |
-| --------- | --------------------- | ------------------------------------------------------------ |
-| `address` | `string`              | REQUIRED: Address associated with the network endpoint without the port ( IP or fully qualified domain name without wildcards). |
-| `ports`   | `map<string, uint32>` | Set of ports associated with the endpoint. The ports must be associated with a port name that was declared as part of the service. |
-| `labels`  | `map<string, string>` | One or more labels associated with the endpoint.             |
+| 字段          | 类型                        | 描述                                                         |
+| ------------- | --------------------------- | ------------------------------------------------------------ |
+| `destination` | [Destination](#Destination) | 必须。destination唯一标识请求/连接应转发到服务实例。         |
+| `weight`      | `int32`                     | 必须。要转发到服务版本的流量比例（0-100）。目标之间的权重总和应该为100.如果规则中只有目的地，则权重值假定为100。 |
 
 ## Gateway
 
-Gateway describes a load balancer operating at the edge of the mesh receiving incoming or outgoing HTTP/TCP connections. The specification describes a set of ports that should be exposed, the type of protocol to use, SNI configuration for the load balancer, etc.
+`网关`描述运行在网格边缘的负载均衡器，用于接收传入或传出的HTTP/TCP连接。该规范描述应该公开的一组端口，使用的协议类型，负载均衡器的SNI配置等。
 
-For example, the following gateway spec sets up a proxy to act as a load balancer exposing port 80 and 9080 (http), 443 (https), and port 2379 (TCP) for ingress. The gateway will be applied to the proxy running on a pod with labels “app: my-gateway-controller”. While Istio will configure the proxy to listen on these ports, it is the responsibility of the user to ensure that external traffic to these ports are allowed into the mesh.
+例如，以下网关配置将搭建一个代理作为负载均衡器，用于暴露入口的端口80和9080（http），443（https）和端口2379（TCP）。该网关将应用于在带有`app：my-gateway-controller`标签的pod上运行的代理。虽然Istio会配置代理以监听这些端口，但用户有责任确保允许这些端口的外部流量进入网格。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -459,6 +362,7 @@ spec:
   - port:
       number: 80
       name: http
+      protocol: HTTP
     hosts:
     - uk.bookinfo.com
     - eu.bookinfo.com
@@ -467,26 +371,31 @@ spec:
   - port:
       number: 443
       name: https
+      protocol: HTTPS
     hosts:
     - uk.bookinfo.com
     - eu.bookinfo.com
     tls:
-      mode: simple #enables HTTPS on this port
+      mode: SIMPLE #enables HTTPS on this port
       serverCertificate: /etc/certs/servercert.pem
       privateKey: /etc/certs/privatekey.pem
   - port:
       number: 9080
       name: http-wildcard
-    # no hosts implies wildcard match
+      protocol: HTTP
+    hosts:
+    - "*"
   - port:
-      number: 2379 #to expose internal service via external port 2379
-      name: Mongo
+      number: 2379 # to expose internal service via external port 2379
+      name: mongo
       protocol: MONGO
+    hosts:
+    - "*"
 ```
 
-The gateway specification above describes the L4-L6 properties of a load balancer. A VirtualService can then be bound to a gateway to control the forwarding of traffic arriving at a particular host or gateway port.
+上面的网关规范描述负载均衡器的L4-L6属性。然后可以将 `VirtualService` 绑定到网关，以便控制到达特定主机或网关端口的流量转发。
 
-For example, the following VirtualService splits traffic for https://uk.bookinfo.com/reviews, https://eu.bookinfo.com/reviews, http://uk.bookinfo.com:9080/reviews, http://eu.bookinfo.com:9080/reviews into two versions (prod and qa) of an internal reviews service on port 9080. In addition, requests containing the cookie user: dev-123 will be sent to special port 7777 in the qa version. The same rule is also applicable inside the mesh for requests to the reviews.prod service. This rule is applicable across ports 443, 9080. Note that http://uk.bookinfo.com gets redirected to https://uk.bookinfo.com (i.e. 80 redirects to 443).
+例如，以下 VirtualService 会将“https://uk.bookinfo.com/reviews”，“https://eu.bookinfo.com/reviews”，“http://uk.bookinfo.com:9080/reviews“，”http://eu.bookinfo.com:9080/reviews“的流量拆分为端口9080上的内部 reviews 服务的两个版本（prod和qa）。此外，包含cookie "user：dev-123" 的请求将被送到qa版本的特殊端口7777。 对于 "reviews.prod.svc.cluster.local" 服务的请求，同样的规则也适用于网格内部。该规则适用于端口443,9080。请注意，“http://uk.bookinfo.com”被重定向到“https://uk.bookinfo.com”（即80重定向到443）。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -495,12 +404,12 @@ metadata:
   name: bookinfo-rule
 spec:
   hosts:
-  - reviews.prod
+  - reviews.prod.svc.cluster.local
   - uk.bookinfo.com
   - eu.bookinfo.com
   gateways:
   - my-gateway
-  - mesh # applies to all the sidecars in the mesh
+  - mesh # 适用于网格内的所有sidecar
   http:
   - match:
     - headers:
@@ -510,22 +419,22 @@ spec:
     - destination:
         port:
           number: 7777
-        name: reviews.qa
+        name: reviews.qa.svc.cluster.local
   - match:
       uri:
         prefix: /reviews/
     route:
     - destination:
         port:
-          number: 9080 # can be omitted if its the only port for reviews
-        name: reviews.prod
+          number: 9080 # 如果是reviews服务的唯一端口，可以省略
+        name: reviews.prod.svc.cluster.local
       weight: 80
     - destination:
-        name: reviews.qa
+        name: reviews.qa.svc.cluster.local
       weight: 20
 ```
 
-The following VirtualService forwards traffic arriving at (external) port 2379 from 172.17.16.0/24 subnet to internal Mongo server on port 5555. This rule is not applicable internally in the mesh as the gateway list omits the reserved name “mesh”.
+以下 VirtualService 将从 “172.17.16.0/24” 子网到（外部）27017端口的流量转发到内部Mongo服务器的5555端口。此规则不适用于网格内部，因为网关列表省略了保留名称 `mesh`。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -534,27 +443,33 @@ metadata:
   name: bookinfo-Mongo
 spec:
   hosts:
-  - Mongosvr #name of Mongo service
+  - mongosvr.prod.svc.cluster.local #name of internal Mongo service
   gateways:
   - my-gateway
   tcp:
   - match:
     - port:
-        number: 2379
+        number: 27017
       sourceSubnet: "172.17.16.0/24"
     route:
     - destination:
-        name: mongo.prod
+        name: mongo.prod.svc.cluster.local
 ```
 
-| Field      | Type                  | Description                                                  |
+| 字段       | 类型                  | 描述                                                         |
 | ---------- | --------------------- | ------------------------------------------------------------ |
-| `servers`  | `Server[]`            | REQUIRED: A list of server specifications.                   |
-| `selector` | `map<string, string>` | One or more labels that indicate a specific set of pods/VMs on which this gateway configuration should be applied. If no selectors are provided, the gateway will be implemented by the default istio-ingress controller. |
+| `servers`  | [`Server[]`](#Server) | 必须: 服务期规范列表                                         |
+| `selector` | `map<string, string>` | 一个或多个标签，用于指示应用此网关配置的特定的Pod / VM集合。标签搜索的范围取决于平台。例如，在Kubernetes上，范围包括在所有可访问的命名空间中运行的pod。 |
+
+## HTTPFaultInjection
+
+HTTPFaultInjection 可以用来指定一个或多个要注入的故障，同时将http请求转发到路由中指定的目的地。故障规范是 VirtualService 规则的一部分。故障包括中止来自下游服务的Http请求，和/或延迟请求的代理。**故障规则必须**有延迟或中止，或两者都有。
+
+注意：延迟和中止故障也是相互独立的，即使两者同时指定。
 
 ## HTTPFaultInjection.Abort
 
-Abort specification is used to prematurely abort a request with a pre-specified error code. The following example will return an HTTP 400 error code for 10% of the requests to the “ratings” service “v1”.
+中止规范用于提前中止带有预定错误代码的请求。以下示例将为“ratings”服务“v1”的10％的请求返回HTTP 400错误代码。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -563,11 +478,11 @@ metadata:
   name: ratings-route
 spec:
   hosts:
-  - ratings
+  - ratings.prod.svc.cluster.local
   http:
   - route:
     - destination:
-        name: ratings
+        host: ratings.prod.svc.cluster.local
         subset: v1
     fault:
       abort:
@@ -575,18 +490,16 @@ spec:
         httpStatus: 400
 ```
 
-The *httpStatus* field is used to indicate the HTTP status code to return to the caller. The optional *percent* field, a value between 0 and 100, is used to only abort a certain percentage of requests. If not specified, all requests are aborted.
+`httpStatus`字段用于指示返回给调用者的HTTP状态码。可选的`percent`字段（0到100之间的值）用于仅中止特定百分比的请求。如果未指定，则所有请求都会中止。
 
-| Field        | Type             | Description                                                  |
-| ------------ | ---------------- | ------------------------------------------------------------ |
-| `percent`    | `int32`          | Percentage of requests to be aborted with the error code provided (0-100). |
-| `httpStatus` | `int32 (oneof)`  | REQUIRED. HTTP status code to use to abort the Http request. |
-| `grpcStatus` | `string (oneof)` | (– NOT IMPLEMENTED –)                                        |
-| `http2Error` | `string (oneof)` | (– NOT IMPLEMENTED –)                                        |
+| 字段         | 类型            | 描述                                          |
+| ------------ | --------------- | --------------------------------------------- |
+| `percent`    | `int32`         | 中止请求的百分比（0-100），使用提供的错误码。 |
+| `httpStatus` | `int32 (oneof)` | 必须。用来种植HTTP请求的HTTP 状态码。         |
 
 ## HTTPFaultInjection.Delay
 
-Delay specification is used to inject latency into the request forwarding path. The following example will introduce a 5 second delay in 10% of the requests to the “v1” version of the “reviews” service from all pods with label env: prod
+延迟规范用于将延迟注入请求转发路径。以下示例将引入5秒的延迟，给“reviews”服务的“v1”版本的10％的请求，这些服务来自所有带有 env: prod 标签的pod。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -595,14 +508,14 @@ metadata:
   name: reviews-route
 spec:
   hosts:
-  - reviews
+  - reviews.prod.svc.cluster.local
   http:
   - match:
     - sourceLabels:
         env: prod
     route:
     - destination:
-        name: reviews
+        host: reviews.prod.svc.cluster.local
         subset: v1
     fault:
       delay:
@@ -612,15 +525,16 @@ spec:
 
 The *fixedDelay* field is used to indicate the amount of delay in seconds. An optional *percent* field, a value between 0 and 100, can be used to only delay a certain percentage of requests. If left unspecified, all request will be delayed.
 
-| Field              | Type                               | Description                                                  |
-| ------------------ | ---------------------------------- | ------------------------------------------------------------ |
-| `percent`          | `int32`                            | Percentage of requests on which the delay will be injected (0-100). |
-| `fixedDelay`       | `google.protobuf.Duration (oneof)` | REQUIRED. Add a fixed delay before forwarding the request. Format: 1h/1m/1s/1ms. MUST be >=1ms. |
-| `exponentialDelay` | `google.protobuf.Duration (oneof)` | (– Add a delay (based on an exponential function) before forwarding the request. mean delay needed to derive the exponential delay values –) |
+`fixedDelay`字段用于指定以秒为单位的延迟量。可选的`percent`字段（0到100之间的值）可用于延迟一定比例的请求。如果未指定，所有请求将被延迟。
+
+| 字段         | 类型                               | 描述                                                         |
+| ------------ | ---------------------------------- | ------------------------------------------------------------ |
+| `percent`    | `int32`                            | 将要注入延迟的请求百分比(0-100).                             |
+| `fixedDelay` | `google.protobuf.Duration (oneof)` | 必须. 在转发请求之前增加固定的延迟。格式： 1h/1m/1s/1ms. 必须大于等于 1ms. |
 
 ## HTTPMatchRequest
 
-HttpMatchRequest specifies a set of criterion to be met in order for the rule to be applied to the HTTP request. For example, the following restricts the rule to match only requests where the URL path starts with /ratings/v2/ and the request contains a “cookie” with value “user=jason”.
+HttpMatchRequest 指定了一组要满足的规范，以便将规则应用于HTTP请求。例如以下限制规范仅匹配URL路径以 `/ratings/v2/` 开头并且请求包含值为 `user=jason` 的cookie的请求。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -629,7 +543,7 @@ metadata:
   name: ratings-route
 spec:
   hosts:
-  - ratings
+  - ratings.prod.svc.cluster.local
   http:
   - match:
     - headers:
@@ -637,27 +551,27 @@ spec:
           regex: "^(.*?;)?(user=jason)(;.*)?"
         uri:
           prefix: "/ratings/v2/"
-    route: 
+    route:
     - destination:
-        name: ratings
+        host: ratings.prod.svc.cluster.local
 ```
 
-HTTPMatchRequest CANNOT be empty.
+HTTPMatchRequest **不可以**为空。
 
-| Field          | Type                       | Description                                                  |
-| -------------- | -------------------------- | ------------------------------------------------------------ |
-| `uri`          | `StringMatch`              | URI to match values are case-sensitive and formatted as follows:*exact: “value”* or just *“value”* for exact string match*prefix: “value”* for prefix-based match*regex: “value”* for ECMAscript style regex-based match |
-| `scheme`       | `StringMatch`              | URI Scheme values are case-sensitive and formatted as follows:*exact: “value”* or just *“value”* for exact string match*prefix: “value”* for prefix-based match*regex: “value”* for ECMAscript style regex-based match |
-| `method`       | `StringMatch`              | HTTP Method values are case-sensitive and formatted as follows:*exact: “value”* or just *“value”* for exact string match*prefix: “value”* for prefix-based match*regex: “value”* for ECMAscript style regex-based match |
-| `authority`    | `StringMatch`              | HTTP Authority values are case-sensitive and formatted as follows:*exact: “value”* or just *“value”* for exact string match*prefix: “value”* for prefix-based match*regex: “value”* for ECMAscript style regex-based match |
-| `headers`      | `map<string, StringMatch>` | The header keys must be lowercase and use hyphen as the separator, e.g. *x-request-id*.Header values are case-sensitive and formatted as follows:*exact: “value”* or just *“value”* for exact string match*prefix: “value”* for prefix-based match*regex: “value”* for ECMAscript style regex-based match*Note:* The keys *uri*, *scheme*, *method*, and *authority* will be ignored. |
-| `port`         | `PortSelector`             | Specifies the ports on the host that is being addressed. Many services only expose a single port or label ports with the protocols they support, in these cases it is not required to explicitly select the port. Note that selection priority is to first match by name and then match by number.Names must comply with DNS label syntax (rfc1035) and therefore cannot collide with numbers. If there are multiple ports on a service with the same protocol the names should be of the form-. |
-| `sourceLabels` | `map<string, string>`      | One or more labels that constrain the applicability of a rule to workloads with the given labels. If the VirtualService has a list of gateways specified at the top, it should include the reserved gateway “mesh” in order for this field to be applicable. |
-| `gateways`     | `string[]`                 | Names of gateways where the rule should be applied to. Gateway names at the top of the VirtualService (if any) are overridden. The gateway match is independent of sourceLabels. |
+| 字段           | 类型                          | 描述                                                         |
+| -------------- | ----------------------------- | ------------------------------------------------------------ |
+| `uri`          | [`StringMatch`](#StringMatch) | 用来匹配值的URI，区分大小写，格式如下：<br />- `exact: "value"` 用于精确字符串匹配<br />-`perfix: "value"` 用于基于前缀的匹配<br />- `regex: "value"` 用于ECMAscript风格的基于正则表达式的匹配 |
+| `scheme`       | [`StringMatch`](#StringMatch) | URI的scheme值，区分大小写，格式如下：<br />- `exact: "value"` 用于精确字符串匹配<br />-`perfix: "value"` 用于基于前缀的匹配<br />- `regex: "value"` 用于ECMAscript风格的基于正则表达式的匹配 |
+| `method`       | [`StringMatch`](#StringMatch) | HTTP方法的值，区分大小写，格式如下：<br />- `exact: "value"` 用于精确字符串匹配<br />-`perfix: "value"` 用于基于前缀的匹配<br />- `regex: "value"` 用于ECMAscript风格的基于正则表达式的匹配 |
+| `authority`    | [`StringMatch`](#StringMatch) | HTTP Authority的值，区分大小写，格式如下：<br />- `exact: "value"` 用于精确字符串匹配<br />-`perfix: "value"` 用于基于前缀的匹配<br />- `regex: "value"` 用于ECMAscript风格的基于正则表达式的匹配 |
+| `headers`      | `map<string, StringMatch>`    | header key 必须是小写字母，并使用连字符作为分隔符，例如 ` *x-request-id*`。 <br /><br />- `exact: "value"` 用于精确字符串匹配<br />-`perfix: "value"` 用于基于前缀的匹配<br />- `regex: "value"` 用于ECMAscript风格的基于正则表达式的匹配<br /><br />注意：key `uri`, `scheme`, `method`, 和 `authority` 将被忽略。 |
+| `port`         | `uint32`                      | 指定将要寻址的主机上的端口。许多服务只暴露单个端口，或者用它们支持的协议给端口打了标签，在这种情况下，不需要显式选择端口。 |
+| `sourceLabels` | `map<string, string>`         | 一个或多个标签，用于限制规则的适用性，使之只适用于具有给定标签的工作负载。如果 VirtualService 在顶部指定有网关列表，则它应该包括保留的 `mesh` 网管，以便适用这个字段。 |
+| `gateways`     | `string[]`                    | 要应用规则的网关名称。VirtualService (如果有)顶部的网关名称将被覆盖。网关匹配独立于sourceLabels。 |
 
 ## HTTPRedirect
 
-HTTPRedirect can be used to send a 302 redirect response to the caller, where the Authority/Host and the URI in the response can be swapped with the specified values. For example, the following rule redirects requests for /v1/getProductRatings API on the ratings service to /v1/bookRatings provided by the bookratings service.
+HTTPRedirect 可以用来向调用者发送302重定向响应，响应中的 Authority / Host 和URI可以与指定的值交换。例如，以下规则将 ratings 服务上的 `/v1/getProductRatings` API的请求重定向到 bookratings 服务提供的 `/v1/bookRatings`。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -666,25 +580,25 @@ metadata:
   name: ratings-route
 spec:
   hosts:
-  - ratings
+  - ratings.prod.svc.cluster.local
   http:
   - match:
     - uri:
         exact: /v1/getProductRatings
   redirect:
     uri: /v1/bookRatings
-    authority: bookratings.default.svc.cluster.local
+    authority: newratings.default.svc.cluster.local
   ...
 ```
 
-| Field       | Type     | Description                                                  |
+| 字段        | 类型     | 描述                                                         |
 | ----------- | -------- | ------------------------------------------------------------ |
-| `uri`       | `string` | On a redirect, overwrite the Path portion of the URL with this value. Note that the entire path will be replaced, irrespective of the request URI being matched as an exact path or prefix. |
-| `authority` | `string` | On a redirect, overwrite the Authority/Host portion of the URL with this value. |
+| `uri`       | `string` | 在重定向时，使用此值覆盖URL的Path部分。 请注意，整个路径将被替换，而不管请求URI是精确路径匹配还是前缀匹配。 |
+| `authority` | `string` | 在重定向时，使用该值覆盖URL的 Authority/Host 部分。          |
 
 ## HTTPRetry
 
-Describes the retry policy to use when a HTTP request fails. For example, the following rule sets the maximum number of retries to 3 when calling ratings:v1 service, with a 2s timeout per retry attempt.
+描述在HTTP请求失败时使用的重试策略。例如，以下规则将在调用 ratings:v1 服务时的重试最大次数设置为3，每次重试尝试时有2秒的超时时间。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -693,25 +607,25 @@ metadata:
   name: ratings-route
 spec:
   hosts:
-  - ratings
+  - ratings.prod.svc.cluster.local
   http:
   - route:
     - destination:
-        name: ratings
+        host: ratings.prod.svc.cluster.local
         subset: v1
     retries:
       attempts: 3
       perTryTimeout: 2s
 ```
 
-| Field           | Type                       | Description                                                  |
+| 字段            | 类型                       | 描述                                                         |
 | --------------- | -------------------------- | ------------------------------------------------------------ |
-| `attempts`      | `int32`                    | REQUIRED. Number of retries for a given request. The interval between retries will be determined automatically (25ms+). Actual number of retries attempted depends on the httpReqTimeout. |
-| `perTryTimeout` | `google.protobuf.Duration` | Timeout per retry attempt for a given request. format: 1h/1m/1s/1ms. MUST BE >=1ms. |
+| `attempts`      | `int32`                    | 必须。给定请求的重试次数。重试间隔将自动确定（25ms +）。实际尝试的重试次数取决于httpReqTimeout。 |
+| `perTryTimeout` | `google.protobuf.Duration` | 对于给定请求，每次尝试重试的超时时间。格式： 1h/1m/1s/1ms. 必须大于等于 1ms. |
 
 ## HTTPRewrite
 
-HTTPRewrite can be used to rewrite specific parts of a HTTP request before forwarding the request to the destination. Rewrite primitive can be used only with the DestinationWeights. The following example demonstrates how to rewrite the URL prefix for api call (/ratings) to ratings service before making the actual API call.
+HTTPRewrite 可用于在将请求转发到目的地之前重写HTTP请求的特定部分。重写原语只能用于 DestinationWeights。以下示例演示如何在进行实际API调用之前重写到 ratings 服务的 api 调用（/ ratings）的URL前缀。
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -720,7 +634,7 @@ metadata:
   name: ratings-route
 spec:
   hosts:
-  - ratings
+  - ratings.prod.svc.cluster.local
   http:
   - match:
     - uri:
@@ -729,22 +643,22 @@ spec:
       uri: /v1/bookRatings
     route:
     - destination:
-        name: ratings
+        host: ratings.prod.svc.cluster.local
         subset: v1
 ```
 
-| Field       | Type     | Description                                                  |
+| 字段        | 类型     | 描述                                                         |
 | ----------- | -------- | ------------------------------------------------------------ |
-| `uri`       | `string` | rewrite the path (or the prefix) portion of the URI with this value. If the original URI was matched based on prefix, the value provided in this field will replace the corresponding matched prefix. |
-| `authority` | `string` | rewrite the Authority/Host header with this value.           |
+| `uri`       | `string` | 使用这个值重写URI的path（或prefix）部分。如果原始URI是基于前缀匹配的，则此字段中提供的值将替换相应的被匹配的前缀。 |
+| `authority` | `string` | 使用这个值重写 Authority/Host header。                       |
 
 ## HTTPRoute
 
-Describes match conditions and actions for routing HTTP/1.1, HTTP2, and gRPC traffic. See VirtualService for usage examples.
+描述用于路由 HTTP/1.1，HTTP2和gRPC流量的匹配条件和行动。有关使用示例，请参阅VirtualService。
 
-| Field              | Type                       | Description                                                  |
+| 字段               | 类型                       | 描述                                                         |
 | ------------------ | -------------------------- | ------------------------------------------------------------ |
-| `match`            | `HTTPMatchRequest[]`       | Match conditions to be satisfied for the rule to be activated. All conditions inside a single match block have AND semantics, while the list of match blocks have OR semantics. The rule is matched if any one of the match blocks succeed. |
+| `match`            | `HTTPMatchRequest[]`       | Match conditions to be satisfied for the rule to be activated. All conditions inside a single match block have AND semantics, while the list of match blocks have OR semantics. The rule is matched if any one of the match blocks succeed.要激活的规则满足匹配条件。 单个匹配块内的所有条件都具有AND语义，而匹配块列表具有OR语义。 如果任何一个匹配块成功，则匹配该规则。 |
 | `route`            | `DestinationWeight[]`      | A http rule can either redirect or forward (default) traffic. The forwarding target can be one of several versions of a service (see glossary in beginning of document). Weights associated with the service version determine the proportion of traffic it receives. |
 | `redirect`         | `HTTPRedirect`             | A http rule can either redirect or forward (default) traffic. If traffic passthrough option is specified in the rule, route/redirect will be ignored. The redirect primitive can be used to send a HTTP 302 redirect to a different URI or Authority. |
 | `rewrite`          | `HTTPRewrite`              | Rewrite HTTP URIs and Authority headers. Rewrite cannot be used with Redirect primitive. Rewrite will be performed before forwarding. |

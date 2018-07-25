@@ -1,223 +1,211 @@
 # Mixer 适配器模型
 
-This package defines the service and types used by adapter code to serve requests from Mixer. This package also defines the types that are used to create Mixer templates.
+该软件包定义被适配器代码使用的服务和类型以便服务来自Mixer的请求。该软件包也定义用于创建Mixer模板的类型。
 
-## Services
+> 原始文件地址：
+>
+> https://github.com/istio/api/blob/master/mixer/adapter/model/v1beta1/istio.mixer.adapter.model.v1beta1.pb.html
+
+## 服务
 
 ### InfrastructureBackend
 
-`InfrastructureBackend` is implemented by backends that wants to provide telemetry and policy functionality to Mixer as an out of process adapter.
+`InfrastructureBackend`由为Mixer提供遥测和策略功能的后端实现，作为进程外适配器。
 
-`InfrastructureBackend` allows Mixer and the backends to have a session based model. In a session based model, Mixer passes the relevant configuration state to the backend only once and estabilshes a session using a session identifier. All future communications between Mixer and the backend uses the session identifier which refers to the previously passed in configuration data.
+`InfrastructureBackend`让Mixer和后端拥有基于会话的模型。在基于会话的模型中，Mixer只将相关配置状态传递给后端一次，并使用会话标识符建立会话。 未来Mixer和后端之间的所有通信都使用会话标识符，该标识符指向先前传入的配置数据。
 
-For a given `InfrastructureBackend`, Mixer calls the `Validate` function, followed by `CreateSession`. The `session_id`returned from `CreateSession` is used to make subsequent request-time Handle calls and the eventual `CloseSession`function. Mixer assumes that, given the `session_id`, the backend can retrieve the necessary context to serve the Handle calls that contains the request-time payload (template-specific instance protobuf).
+对于给定的`InfrastructureBackend`，Mixer调用`Validate`函数，接着调用`CreateSession`。从`CreateSession`返回的`session_id`用于进行后续的请求时的处理调用和最后的`CloseSession`函数。 Mixer假定，在有`session_id`的情况下，后端可以检索必要的上下文以服务于包含请求时负载（特定模板的实例protobuf）的处理调用。
 
 ```
 rpc Validate(ValidateRequest) returns (ValidateResponse)
 ```
 
-Validates the handler configuration along with the template-specific instances that would be routed to that handler. The `CreateSession` for a specific handler configuration is invoked only if its associated `Validate` call has returned success.
+验证处理程序配置以及将被路由到该处理程序的特定模板实例。只有当其关联的`Validate`调用返回成功时，才会调用特定处理程序配置的`CreateSession`。
 
 ```
 rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse)
 ```
 
-Creates a session for a given handler configuration and the template-specific instances that would be routed to that handler. For every handler configuration, Mixer creates a separate session by invoking `CreateSession` on the backend.
+为给定的处理程序配置和将被路由到该处理程序的特定模板实例创建会话。对于每个处理程序配置，Mixer通过在后端调用`CreateSession`创建单独的会话。
 
-`CreateSessionRequest` contains the adapter specific handler configuration and the inferred type information about the instances the handler would receive during request processing.
+`CreateSessionRequest`包含特定于适配器的处理程序配置以及和实例相关的推断类型信息，处理程序在请求处理期间将接收这些信息。
 
-`CreateSession` must return a `session_id` which Mixer uses to invoke template-specific Handle functions during request processing. The `session_id` provides the Handle functions a way to retrieve the necessary configuration associated with the session. Upon Mixer configuration change, Mixer will re-invoke `CreateSession` for all handler configurations whose existing sessions are invalidated or didn’t existed.
+`CreateSession`必须返回`session_id`，在请求处理过程中，Mixer用它来调用模板特定的Handle函数。`session_id`为Handle函数提供一种方式来检索与会话相关的必要配置。当Mixer配置发生变化时，Mixer将为现有会话无效或不存在的所有处理程序配置重新调用`CreateSession`。
 
-Backend is allowed to return the same session id if given the same configuration block. This would happen when multiple instances of Mixer in a deployment all create sessions with the same configuration. Note that given individial instances of Mixer can call `CloseSession`, reusing `session_id` by the backend assumes that the backend is doing reference counting.
+如果给定相同的配置块，后端可以返回相同的会话ID。当部署中的多个Mixer实例都使用相同的配置创建会话时，会发生这种情况。请注意，单个的Mixer实例可以调用`CloseSession`，后端重用`session_id`是假设后端正在做引用计数。
 
-If the backend couldn’t create a session for a specific handler configuration and returns non S_OK status, Mixer will not make request-time Handle calls associated with that handler configuration.
+如果后端无法为特定的处理程序配置创建会话并返回非S_OK状态，则Mixer将不会发出与该处理程序配置关联的请求时处理调用。
 
 ```
 rpc CloseSession(CloseSessionRequest) returns (CloseSessionResponse)
 ```
 
-Closes the session associated with the `session_id`. Mixer closes a session when its associated handler configuration or the instance configuration changes. Backend is supposed to cleanup all the resources associated with the session_id referenced by CloseSessionRequest.
+关闭与`session_id`关联的会话。当关联的处理程序配置或实例配置更改时，Mixer关闭会话。后端应该清理与由`CloseSessionRequest`引用的`session_id`相关的所有资源。
 
-## Types
+## 类型
 
 ### CheckResult
 
-Expresses the result of a precondition check.
+表示前置条件检查的结果。
 
-| Field           | Type                       | Description                                                  |
-| --------------- | -------------------------- | ------------------------------------------------------------ |
-| `status`        | `google.rpc.Status`        | A status code of OK indicates preconditions were satisfied. Any other code indicates preconditions were not satisfied and details describe why. |
-| `validDuration` | `google.protobuf.Duration` | The amount of time for which this result can be considered valid. |
-| `validUseCount` | `int32`                    | The number of uses for which this result can be considered valid. |
+| 字段          | 类型                     | 描述                                                         |
+| :------------ | :----------------------- | :----------------------------------------------------------- |
+| status        | google.rpc.Status        | OK状态码代表前置条件被满足。其他状态码代表前置条件不满足，而detail属性描述为什么 |
+| validDuration | google.protobuf.Duration | 结果可以被认为有效的时间数量                                 |
+| validUseCount | int32                    | 结果可以被认为有效的使用次数                                 |
 
 ### CloseSessionRequest
 
-Request message for `CloseSession` method.
+`CloseSession` 方法的请求消息。
 
-| Field       | Type     | Description                     |
-| ----------- | -------- | ------------------------------- |
-| `sessionId` | `string` | Id of the session to be closed. |
+| 字段      | 类型   | 描述             |
+| :-------- | :----- | :--------------- |
+| `sessionId` | `string` | 要关闭的会话的ID |
 
 ### CloseSessionResponse
 
-Response message for `CloseSession` method.
+`CloseSession` 方法的应答消息。
 
-| Field    | Type                | Description                                       |
-| -------- | ------------------- | ------------------------------------------------- |
-| `status` | `google.rpc.Status` | The success/failure status of close session call. |
+| 字段   | 类型                | 描述                        |
+| :----- | :------------------ | :-------------------------- |
+| `status` | `google.rpc.Status` | 关闭会话调用的成功/失败状态 |
 
 ### CreateSessionRequest
 
-Request message for `CreateSession` method.
+`CreateSession` 方法的请求消息。
 
-| Field           | Type                               | Description                                                  |
-| --------------- | ---------------------------------- | ------------------------------------------------------------ |
-| `adapterConfig` | `google.protobuf.Any`              | Adapter specific configuration.                              |
-| `inferredTypes` | `map<string, google.protobuf.Any>` | Map of instance names to their template-specific inferred type. |
+| 字段          | 类型             | 描述                                 |
+| :------------ | :----------------------------------------------------------- | :----------------------------------- |
+| `adapterConfig` | `google.protobuf.Any` | adapter特有配置                      |
+| `inferredTypes` | `map<string, google.protobuf.Any>` | 实例名字到它们模板特有推断类型的映射 |
 
 ### CreateSessionResponse
 
-Response message for `CreateSession` method.
+`CreateSession` 方法的应答消息。
 
-| Field       | Type                | Description                                        |
-| ----------- | ------------------- | -------------------------------------------------- |
-| `sessionId` | `string`            | Id of the created session.                         |
-| `status`    | `google.rpc.Status` | The success/failure status of create session call. |
-
-### DNSName
-
-DNSName is used inside templates for fields that are of ValueType “DNS_NAME”
-
-### Duration
-
-Duration is used inside templates for fields that are of ValueType “DURATION”
-
-### EmailAddress
-
-EmailAddress is used inside templates for fields that are of ValueType “EMAIL_ADDRESS” DO NOT USE !! Under Development
-
-### IPAddress
-
-IPAddress is used inside templates for fields that are of ValueType “IP_ADDRESS”
+| 字段      | 类型                | 描述                    |
+| :-------- | :------------------ | :---------------------- |
+| `sessionId` | `string`              | 创建的会话的ID          |
+| `status`    | `google.rpc.Status` | 验证调用的成功/失败状态 |
 
 ### Info
 
-Info describes an adapter or a backend that wants to provide telemetry and policy functionality to Mixer as an out of process adapter.
+Info描述为Mixer提供遥测和策略功能的适配器或者后端，作为进程外适配器。
 
-| Field         | Type       | Description                                                  |
-| ------------- | ---------- | ------------------------------------------------------------ |
-| `name`        | `string`   | Name of the adapter. It must be an RFC 1035 compatible DNS label matching the `^[a-z]([-a-z0-9]*[a-z0-9])?$` regular expression. Name is used in Istio configuration, therefore it should be descriptive but short. example: denier Vendor adapters should use a vendor prefix. example: mycompany-denier |
-| `description` | `string`   | User-friendly description of the adapter.                    |
-| `templates`   | `string[]` | Base64 encoded proto descriptor of all the templates the adapter wants to serve. |
-| `config`      | `string`   | Base64 encoded proto descriptor of the adapter configuration. |
+| 字段         | 类型     | 描述                                                         |
+| :----------- | :------- | :----------------------------------------------------------- |
+| `name`         | `string`   | 适配器的名称。必须符合RFC 1035的DNS标签，匹配`^[a-z]([-a-z0-9]*[a-z0-9])?$`正则表达式。名称用于Istio配置，因此它应该是描述性的，但是很短。例如：denier供应商适配器应该使用供应商前缀。例如：mycompany-denier |
+| `description`  | `string`   | 适配器的用户友好描述                                         |
+| `templates`    | `string[]` | 适配器支持的模板名字                                         |
+| `config`       | `string`   | 适配器配置的proto  descriptor，Base64编码                    |
+| `sessionBased` | `bool`     | 如果后端实现了 `InfrastructureBackend` 服务则为true，否则为false<br> 如果为true，在配置时刻，Mixer调用  `InfrastructureBackend` 的RPC来验证和传递处理程序配置。然后在请求时刻，mixer不再传递处理程序配置，并只使用模板特有处理服务(例如 `HandlerMetricService`, `HandlerListEntryService`, `HandleQuotaService`等)传递模板特有实例负载。如果 `sessionBased` 为false，mixer不期望后端实现了 `InfrastructureBackend` 服务，并只通过模板特有处理服务在请求时刻和后端通讯。没有 `InfrastructureBackend` 服务的情况下，mixer在请求时刻的每次调用时传递处理器配置。 |
 
 ### QuotaRequest
 
-Expresses the quota allocation request.
+表示配额分配请求。
 
-| Field    | Type                                    | Description                       |
-| -------- | --------------------------------------- | --------------------------------- |
-| `quotas` | `map<string, QuotaRequest.QuotaParams>` | The individual quotas to allocate |
+| 字段   | 类型                                  | 描述             |
+| :----- | :------------------------------------ | :--------------- |
+| `quotas` | `map<string, QuotaRequest.QuotaParams>` | 要分配的单个配额 |
 
 ### QuotaRequest.QuotaParams
 
-parameters for a quota allocation
+单个配额分配的参数。
 
-| Field        | Type    | Description                                                  |
-| ------------ | ------- | ------------------------------------------------------------ |
-| `amount`     | `int64` | Amount of quota to allocate                                  |
-| `bestEffort` | `bool`  | When true, supports returning less quota than what was requested. |
+| 字段       | 类型  | 描述                                     |
+| :--------- | :---- | :--------------------------------------- |
+| `amount`     | `int64` | 要分配的配额数量                         |
+| `bestEffort` | `bool`  | 当设置为true时，支持返回比请求要少的配额 |
 
 ### QuotaResult
 
-Expresses the result of multiple quota allocations.
+表示多个配额分配的结果。
 
-| Field    | Type                              | Description                                         |
-| -------- | --------------------------------- | --------------------------------------------------- |
-| `quotas` | `map<string, QuotaResult.Result>` | The resulting quota, one entry per requested quota. |
+| 字段   | 类型                            | 描述                               |
+| :----- | :------------------------------ | :--------------------------------- |
+| `quotas` | `map<string, QuotaResult.Result>` | 分配到的配额，每个请求配额一个实体 |
 
 ### QuotaResult.Result
 
-Expresses the result of a quota allocation.
+单个配额分配的结果。
 
-| Field           | Type                       | Description                                                  |
-| --------------- | -------------------------- | ------------------------------------------------------------ |
-| `validDuration` | `google.protobuf.Duration` | The amount of time for which this result can be considered valid. |
-| `grantedAmount` | `int64`                    | The amount of granted quota. When `QuotaParams.best_effort` is true, this will be >= 0. If `QuotaParams.best_effort` is false, this will be either 0 or >= `QuotaParams.amount`. |
+| 字段          | 类型                     | 描述                                                         |
+| :------------ | :----------------------- | :----------------------------------------------------------- |
+| `validDuration` | `google.protobuf.Duration` | 结果可以被认为有效的时间数量                                 |
+| `grantedAmount` | `int64`                    | 授予配额的数量。当 `QuotaParams.best_effort` 为true时，将 >=0。如果 `QuotaParams.best_effort` 为false，则要么是0，要么  >= `QuotaParams.amount` |
 
 ### ReportResult
 
-Expresses the result of a report call.
+表示report调用的结果。
+
+> 备注：这是个空消息，没有任何字段。
+
+### Template
+
+Template提供mixer模板的详情。
+
+| 字段       | 类型   | 描述                                |
+| :--------- | :----- | :---------------------------------- |
+| descriptor | string | 模板的proto  descriptor，Base64编码 |
 
 ### TemplateVariety
 
-The available varieties of templates, controlling the semantics of what an adapter does with each instance.
+模板可用的品类，控制适配器对每个实例执行的语义。
 
-| Name                                   | Description                                             |
-| -------------------------------------- | ------------------------------------------------------- |
-| `TEMPLATE_VARIETY_CHECK`               | Makes the template applicable for Mixer’s check calls.  |
-| `TEMPLATE_VARIETY_REPORT`              | Makes the template applicable for Mixer’s report calls. |
-| `TEMPLATE_VARIETY_QUOTA`               | Makes the template applicable for Mixer’s quota calls.  |
-| `TEMPLATE_VARIETY_ATTRIBUTE_GENERATOR` | Makes the template applicable for Mixer’s quota calls.  |
-
-### TimeStamp
-
-TimeStamp is used inside templates for fields that are of ValueType “TIMESTAMP”
-
-### Uri
-
-Uri is used inside templates for fields that are of ValueType “URI” DO NOT USE ! Under Development
+| 名称                                 | 描述                                                         |
+| :----------------------------------- | :----------------------------------------------------------- |
+| `TEMPLATE_VARIETY_CHECK`               | 使模板适用于Mixer的check调用。此类模板的实例在Mixer的check调用期间创建，并根据规则配置传递给处理程序。 |
+| `TEMPLATE_VARIETY_REPORT`              | 使模板适用于Mixer的report调用。此类模板的实例在Mixer的report调用期间创建，并根据规则配置传递给处理程序。 |
+| `TEMPLATE_VARIETY_QUOTA`               | 使模板适用于Mixer的quota调用。此类模板的实例在Mixer的quota check调用期间创建，并根据规则配置传递给处理程序。 |
+| `TEMPLATE_VARIETY_ATTRIBUTE_GENERATOR` | 使模板适用于Mixer的属性生成阶段。此类模板的实例在预处理属性生成阶段期间创建，并根据规则配置传递给处理程序。 |
 
 ### ValidateRequest
 
-Request message for `Validate` method.
+`Validate` 方法的请求消息。
 
-| Field           | Type                               | Description                                                  |
-| --------------- | ---------------------------------- | ------------------------------------------------------------ |
-| `adapterConfig` | `google.protobuf.Any`              | Adapter specific configuration.                              |
-| `inferredTypes` | `map<string, google.protobuf.Any>` | Map of instance names to their template-specific inferred type. |
+| 字段          | 类型           | 描述                                 |
+| :------------ | :----------------------------------------------------------- | :----------------------------------- |
+| `adapterConfig` | `google.protobuf.Any` | adapter特有配置                      |
+| `inferredTypes` | `map<string, google.protobuf.Any>` | 实例名字到它们模板特有推断类型的映射 |
 
 ### ValidateResponse
 
-Response message for `Validate` method.
+`Validate` 方法的应答消息。
 
-| Field    | Type                | Description                                    |
-| -------- | ------------------- | ---------------------------------------------- |
-| `status` | `google.rpc.Status` | The success/failure status of validation call. |
-
-### Value
-
-Value is used inside templates for fields that have dynamic types. The actual datatype of the field depends on the datatype of the expression used in the operator configuration.
+| 字段   | 类型                | 描述                    |
+| :----- | :------------------ | :---------------------- |
+| `status` | `google.rpc.Status` | 验证调用的成功/失败状态 |
 
 ### google.rpc.Status
 
-The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). The error model is designed to be:
+`Status` 类型定义逻辑错误模型，适用于不同的编程环境，包括REST API和RPC API。用于[gRPC](https://github.com/grpc)。错误模型设计为：
 
-- Simple to use and understand for most users
-- Flexible enough to meet unexpected needs
+- 对于大多数用户，可以简单的使用和理解
+- 足够弹性来应对意外需求
 
-#### Overview
+#### 概述
 
-The `Status` message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of *google.rpc.Code*, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers *understand* and *resolve* the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package `google.rpc` that can be used for common error conditions.
+`Status` 消息包含三块数据：错误码，错误消息和错误详情。错误码是*google.rpc.Code*的枚举值，但是在需要是可以接受额外的错误码。错误消息应该是面对开发人员的英语消息，帮助开发人员理解和解决错误。如果需要本地化的面对用户的错误消息，在错误详情中放置本地化的消息，或者在客户端做本地化。可选的错误详情可以包含有关错误的任意信息。在包 `google.rpc` 中有预定义定义的错误详情类型，可以用于常见错误条件。
 
-#### Language mapping
+### 语言映射
 
-The `Status` message is the logical representation of the error model, but it is not necessarily the actual wire format. When the `Status` message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.
+`Status` 消息是错误模型的逻辑表示，但是它不一定是实际的格式。当 `Status` 消息在不同的客户端类库和不同的协议中暴露时，它可以有不同的映射。例如，在java中它可能映射到某些异常，但是在C中更多的映射到某些错误代码。
 
-#### Other uses
+### 其他使用
 
-The error model and the `Status` message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.
+错误模型和`Status` 消息可以在不同的环境中使用，无论带或者不带API，以便在不同环境下提供一致的开发体验。
 
-Example uses of this error model include:
+这个错误模型的使用例子包括：
 
-- Partial errors. If a service needs to return partial errors to the client, it may embed the `Status` in the normal response to indicate the partial errors.
-- Workflow errors. A typical workflow has multiple steps. Each step may have a `Status` message for error reporting.
-- Batch operations. If a client uses batch request and batch response, the `Status` message should be used directly inside batch response, one for each error sub-response.
-- Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the `Status` message.
-- Logging. If some API errors are stored in logs, the message `Status` could be used directly after any stripping needed for security/privacy reasons.
+- 部分错误。如果服务需要返回部分错误给客户端，它可以在正常的应答中嵌入 Status 。
+- 工作流错误。典型的工作量有多个步骤。每个步骤需要有一个`Status` 消息用来错误报告。
+- 批量操作。如果客户端采用批量请求和批量应答，`Status` 消息可以直接在批量应答直接使用。
+- 异步操作。如果一个API调用将异步操作结果内嵌到它的响应中，则这些操作的状态应该使用`Status` 消息直接表述。
+- 日志。如果某些API错误被存储在日志中，`Status` 消息可以在脱敏之后直接使用，脱敏是出于必要的安全和隐私原因。
 
-| Field     | Type                    | Description                                                  |
-| --------- | ----------------------- | ------------------------------------------------------------ |
-| `code`    | `int32`                 | The status code, which should be an enum value of *google.rpc.Code*. |
-| `message` | `string`                | A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details](https://istio.io/docs/reference/config/mixer/istio.mixer.adapter.model.v1beta1.html#google.rpc.Status.details) field, or localized by the client. |
-| `details` | `google.protobuf.Any[]` | A list of messages that carry the error details. There is a common set of message types for APIs to use. |
+| 字段    | 类型                                                         | 描述                                                         |
+| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| code    | int32                                                        | 状态码，必须是` google.rpc.Code`的枚举值                     |
+| message | string                                                       | 面向开发者的错误信息，应该用英文。任何对象用户的错误信息应该本地化然后在 `google.rpc.Status.details` 字段中发送，或者由客户端进行本地化。 |
+| details | `google.protobuf.Any` | 携带错误详情的消息列表。有通用的消息类型集合给API使用        |
+
